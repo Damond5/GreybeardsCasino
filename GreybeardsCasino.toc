@@ -1,0 +1,11 @@
+## Interface: 80205
+## Title:|cff33330aGreybeardsCasino
+## Author: Looch
+## 1.13 Maintainer: Looch <The Greybeards> - Heartseeker
+## Version: 1.13
+## DefaultState: Disabled
+## LoadOnDemand: 0
+## Notes: Gamble time. A fun way to lose gold. Or win it.
+## SavedVariables: GreybeardsCasino
+
+GreybeardsCasino.xml
