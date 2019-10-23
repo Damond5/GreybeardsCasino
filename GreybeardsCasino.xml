@@ -58,7 +58,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						GBC_CloseFrame()
+						GBC_CloseFrame();
 					</OnClick>
 				</Scripts>
 			</Button>

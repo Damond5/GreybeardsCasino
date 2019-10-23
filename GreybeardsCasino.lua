@@ -6,7 +6,7 @@ g_app = {
 	channelName = "GamblinGreybeards",
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
-	chatmethods = {
+	chatMethods = {
 		"RAID",
 		"PARTY",
 		"GUILD",
@@ -18,7 +18,7 @@ g_app = {
 	showMinimap = false
 }
 
-g_roundDefaults {
+g_roundDefaults = {
 	acceptEntries = false,
 	acceptRolls = false,
 	totalRolls = 0,
@@ -199,7 +199,7 @@ function GBC_OnEvent(self, event, ...)
 		GBC_EditBox:SetText(g_app.lastRoll);
 
 		--SetChatTarget
-		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]];
+		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
 		GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
 
 		--MiniMap
@@ -298,12 +298,11 @@ function GBC_Reset()
 end
 
 function GBC_ResetUI()
-{
 	GBC_ROLL_Button:Disable();
 	GBC_AcceptEntries_Button:Enable();
 	GBC_LASTCALL_Button:Disable();
 	GBC_CHAT_Button:Enable();
-}
+end
 
 function GBC_ResetCmd()
 	ChatMsg(".:GBC:. Game has been reset", chatmethod)
@@ -483,7 +482,7 @@ function GBC_OnClickRoll1()
 end
 
 function ToggleFrame(show)
-	g_app.hidden = ~show
+	g_app.hidden = not show
 	
 	if g_app.hidden then
 		GBC_Frame:Hide()
@@ -746,7 +745,7 @@ end
 
 function AddPlayer(name)
 	if IsBanned(name) then
-		ChatMsg(format("%s: You're banned from the casino! Get outta here ya degenerate.", name);
+		ChatMsg(format("%s: You're banned from the casino! Get outta here ya degenerate.", name))
 		return	
 	end
 
@@ -863,7 +862,7 @@ function AddTiedPlayer(name, tietable)
 				exists = true;
 			end
 		end
-		if ~exists then
+		if not exists then
 		    table.insert(tietable, insname)
 			g_round.tierolls = g_round.tierolls+1
 			g_round.totalRolls = g_round.totalRolls+1
