@@ -58,7 +58,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						GBC_CloseFrame();
+						GBC_CloseFrame()
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -258,7 +258,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="CG_MinimapButton_DraggingFrame" hidden="true">
+			<Frame name="GBC_MinimapButton_DraggingFrame" hidden="true">
 				<Scripts>
 					<OnUpdate>
 						GBC_MinimapButton_DraggingFrame_OnUpdate()
@@ -303,4 +303,5 @@
 			</OnDragStop>
 		</Scripts>
 	</Frame>
+
 </Ui>

@@ -44,7 +44,7 @@ table = {}
 
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino - WoW Classic!> loaded /cg to use");
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.");
 
 	self:RegisterEvent("CHAT_MSG_RAID");
 	self:RegisterEvent("CHAT_MSG_CHANNEL");
@@ -89,9 +89,9 @@ function GBC_SlashCmd(msg)
 		Print("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]");
 		Print("", "", "minimap - Toggle minimap show/hide");
 		Print("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to");
-		Print("", "", "ban - Ban's the user from being able to roll");
-		Print("", "", "unban - Unban's the user");
-		Print("", "", "listban - Shows ban list");
+		Print("", "", "ban - Ban's the user from being able to roll")
+		Print("", "", "unban - Unban's the user")
+		Print("", "", "listban - Shows ban list")
 		return
 	end
 	
@@ -106,7 +106,7 @@ function GBC_SlashCmd(msg)
 	end
 	
 	if (msg == "reset") then
-		GBC_Reset();
+		GBC_Reset()
 		GBC_ResetCmd()
 		return
 	end
@@ -117,8 +117,8 @@ function GBC_SlashCmd(msg)
 	end
 	
 	if (msg == "resetstats") then
-		Print("", "", "|cffffff00GCG stats have now been reset");
-		ResetStats();
+		Print("", "", "|cffffff00GCG stats have now been reset")
+		ResetStats()
 		return
 	end
 	
@@ -162,13 +162,13 @@ function GBC_SlashCmd(msg)
 end
 
 SLASH_GBC1 = "/GreyCasino";
-SLASH_GBC2 = "/GBC";
-SLASH_GBC1 = "/GreybeardsCasino";
+SLASH_GBC2 = "/gbc";
+SLASH_GBC3 = "/GreybeardsCasino";
 SlashCmdList["GBC"] = GBC_SlashCmd
 
 local function OptionsFormatter(text, prefix)
 	if prefix == "" or prefix == nil then 
-		prefix = "/GBC" 
+		prefix = "/gbc" 
 	end
 	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
 end
@@ -501,33 +501,33 @@ function ToggleMinimap()
 	end
 end
 
-CG_Settings = {
+GBC_Settings = {
 	MinimapPos = 75
 }
 -- ** do not call from the mod's OnLoad, VARIABLES_LOADED or later is fine. **
-function CG_MinimapButton_Reposition()
-	CG_MinimapButton:SetPoint(
+function GBC_MinimapButton_Reposition()
+	GBC_MinimapButton:SetPoint(
 		"TOPLEFT",
 		"Minimap",
 		"TOPLEFT",
-		52-(80*cos(CG_Settings.MinimapPos)),
-		(80*sin(CG_Settings.MinimapPos))-52)
+		52-(80*cos(GBC_Settings.MinimapPos)),
+		(80*sin(GBC_Settings.MinimapPos))-52)
 end
 
 --TODO drag function does not work
-function CG_MinimapButton_DraggingFrame_OnUpdate()
+function GBC_MinimapButton_DraggingFrame_OnUpdate()
 	local xpos,ypos = GetCursorPosition()
 	local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
 
 	xpos = xmin-xpos/UIParent:GetScale()+70
 	ypos = ypos/UIParent:GetScale()-ymin-70
 
-	CG_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
-	CG_MinimapButton_Reposition()
+	GBC_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
+	GBC_MinimapButton_Reposition()
 end
 
 
-function CG_MinimapButton_OnClick()
+function GBC_MinimapButton_OnClick()
 	DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
 end
 
@@ -733,13 +733,13 @@ end
 
 function ListBannedPlayers()
 	local bancnt = 0;
-	Print("", "", "|cffffff00To ban do /cg ban (Name) or to unban /cg unban (Name) - The Current Bans:");
+	Print("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
 	for i=1, table.getn(GBC.bans) do
 		bancnt = 1;
 		DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
 	end
 	if (bancnt == 0) then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /cg ban (Name) or to unban /cg unban (Name).");
+		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
 	end
 end
 
