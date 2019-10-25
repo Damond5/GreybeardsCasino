@@ -28,10 +28,10 @@
 		</Backdrop>
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="Greybeards Casino" inherits="GameFontNormal" text="Greybeards Casino">
+				<FontString name="Greybeards Casino" inherits="GameFontNormal" text="Greybeards Casino - /join GamblinGreybeards">
 					<Anchors>
 						<Anchor point="TOPLEFT">
-							<Offset x="95" y="-175" />
+							<Offset x="18" y="-175" />
 						</Anchor>
 					</Anchors>
 				</FontString>

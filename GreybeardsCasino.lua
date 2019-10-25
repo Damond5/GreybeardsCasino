@@ -3,7 +3,7 @@
 
 g_app = {
 	hidden = true,
-	channelName = "GamblinGreybeards",
+	customChannel = "GreybeardsCasino",
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
 	chatMethods = {
@@ -13,10 +13,11 @@ g_app = {
 		"CHANNEL",
 		"SAY"
 	},
-	currentChatMethod = "RAID",
+	currentChatMethod = "CHANNEL",
 	lastRoll = 100,
 	showMinimap = false,
-	debug = false
+	acceptedEntriesFrame = nil,
+	debug = true
 }
 
 g_roundDefaults = {
@@ -244,10 +245,10 @@ function GBC_OnEvent(self, event, ...)
 	end
 	
 	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and GBC["chat"] == 4 then
-		--local msg,_,_,_,name,_,_,_,channel = ...
-		--if channel == g_app.channelName then
-		--	ParseChatMsg(msg, name)
-		--end
+		local msg,_,_,_,name,_,_,_,channel = ...
+		if channel == g_app.customChannel then
+			ParseChatMsg(msg, name)
+		end
 	end
 
 	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and GBC["chat"] == 5 then
@@ -284,6 +285,10 @@ function GBC_OnClickCHAT()
 	g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
 	
 	GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
+
+	if g_app.currentChatMethod == "CHANNEL" then
+		WriteMsg("","",string.format("Custom channel set to: %s", g_app.customChannel))
+	end
 end
 
 function GBC_OnClickWHISPERS()
@@ -311,6 +316,11 @@ function GBC_ResetUI()
 	GBC_AcceptEntries_Button:Enable();
 	GBC_LASTCALL_Button:Disable();
 	GBC_CHAT_Button:Enable();
+
+	if g_app.acceptedEntriesFrame ~= nil then
+		g_app.acceptedEntriesFrame.text:SetText("")
+		g_app.acceptedEntriesFrame:Hide()
+	end
 end
 
 function GBC_ResetCmd()
@@ -384,14 +394,14 @@ function PrintStats(showAllStats)
 
 	DEFAULT_CHAT_FRAME:AddMessage("--- Greybeards Casino Stats ---", g_app.currentChatMethod)
 
-	if showAllStats then
-		for k = 0, #sortlistamount do
-			local sortsign = "won"
-			if(sortlistamount[k] < 0) then sortsign = "lost" end
-			ChatMsg(string.format("%d.  %s %s %d total", k+1, sortlistname[k], sortsign, math.abs(sortlistamount[k])), g_app.currentChatMethod)
-		end
-		return
-	end
+	--if showAllStats then
+	--	for k = 0, #sortlistamount do
+	--		local sortsign = "won"
+	--		if(sortlistamount[k] < 0) then sortsign = "lost" end
+	--		ChatMsg(string.format("%d.  %s %s %d total", k+1, sortlistname[k], sortsign, math.abs(sortlistamount[k])), g_app.currentChatMethod)
+	--	end
+	--	return
+	--end
 
 	local top = 2;
 	local bottom = n-3;
@@ -402,7 +412,7 @@ function PrintStats(showAllStats)
 	for topIdx = 0, top do
 		sortsign = "won";
 		if(sortlistamount[topIdx] < 0) then sortsign = "lost"; end
-		ChatMsg(string.format("%d.  %s %s %d total", topIdx+1, sortlistname[topIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[topIdx]))), g_app.currentChatMethod);
+		ChatMsg(string.format("%d.  %s %s %s total", topIdx+1, sortlistname[topIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[topIdx]))), g_app.currentChatMethod);
 	end
 
 	if(top+1 < bottom) then
@@ -412,19 +422,20 @@ function PrintStats(showAllStats)
 	for btmIdx = bottom, n-1 do
 		sortsign = "won";
 		if(sortlistamount[btmIdx] < 0) then sortsign = "lost"; end
-		ChatMsg(string.format("%d.  %s %s %d total", btmIdx+1, sortlistname[btmIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[btmIdx]))), g_app.currentChatMethod);
+		ChatMsg(string.format("%d.  %s %s %s total", btmIdx+1, sortlistname[btmIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[btmIdx]))), g_app.currentChatMethod);
 	end
 end
 
 function GBC_OnClickROLL()
-	if g_round.totalRolls > 0 and g_round.acceptRolls then
-		if table.getn(GBC.strings) ~= 0 then
-			ListRemainingPlayers()
-		end
-		return
-	end
-	
-	if (g_round.totalRolls > 1) then
+	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
+	--if g_round.totalRolls > 0 and g_round.acceptRolls then
+	--	if table.getn(GBC.strings) ~= 0 then
+	--		ListRemainingPlayers()
+	--	end
+	--	return
+	--end
+
+	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
 		g_round.acceptEntries = false 
 		g_round.acceptRolls = true 
 		if (g_round.currentTie == 0) then 
@@ -445,7 +456,7 @@ function GBC_OnClickROLL()
 	end
 
 	--TODO bypass this in debug mode
-	if g_round.acceptEntries and g_round.totalRolls < 2 then
+	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
 		ChatMsg("Not enough Players!");
 	end
 end
@@ -554,7 +565,7 @@ function ConvertRollToGold(value)
 end
 
 function ChangeChannel(channel)
-	g_app.channelName = channel
+	g_app.customChannel = channel
 end
 
 function ResetStats()
@@ -566,7 +577,7 @@ function ReportResults()
 	if goldowed ~= 0 then
 		g_round.lowName = g_round.lowName:gsub("^%l", string.upper)
 		g_round.highName = g_round.highName:gsub("^%l", string.upper)
-		local msg = format("%s owes %s < %d >", g_round.lowName, g_round.highName, ConvertRollToGold(goldowed))
+		local msg = format("%s owes %s < %s >", g_round.lowName, g_round.highName, ConvertRollToGold(goldowed))
 
 		--TODO remove, add as flavor text feature
 		if g_round.highName == "Louch" then
@@ -707,6 +718,8 @@ function ParseRoll(msg)
 					end
 				end
 			end
+
+			DebugWrite(string.format("Accepted roll. Removing player %s", player))
 			
 			RemovePlayer(player)
 			g_round.totalEntries = g_round.totalEntries + 1
@@ -732,6 +745,98 @@ function GBC_Check(player)
 	return false
 end
 
+function AddPlayer(name)
+	if IsBanned(name) then
+		ChatMsg(format("%s: You're banned from the casino! Get outta here ya degenerate.", name))
+		return	
+	end
+
+	local charname, realmname = strsplit("-",name);
+	local insname = strlower(charname);
+	
+	if (insname ~= nil or insname ~= "") then
+		local found = false
+		for i=1, table.getn(GBC.strings) do
+		  	if GBC.strings[i] == insname then
+				found = true
+				break
+			end
+		end
+		if not found then
+			table.insert(GBC.strings, insname)
+			g_round.totalRolls = g_round.totalRolls+1
+
+			DebugWrite(format("Added player: %s", insname))
+		end
+	end
+	
+	if not GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 1 then
+		GBC_LASTCALL_Button:Enable();
+	end
+	
+	if g_round.totalRolls == 2 then
+		GBC_AcceptEntries_Button:Disable();
+		GBC_AcceptEntries_Button:SetText("Open Entry");
+	end
+
+	--TODO Update UI call, remove UI functions at this level
+	if g_app.acceptedEntriesFrame == nil then
+		DebugWrite("Creating AcceptedPlayerFrame")
+		g_app.acceptedEntriesFrame = CreateFrame("Frame", "GBC_AcceptEntries", GBC_Frame)
+	end
+
+	g_app.acceptedEntriesFrame:SetFrameStrata("BACKGROUND")
+	g_app.acceptedEntriesFrame:SetWidth(128) 
+	g_app.acceptedEntriesFrame:SetHeight(128) 
+	--g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0,0)
+	--g_app.acceptedEntriesFrame:SetBackground("Interface\\DialogFrame\\UI-DialogBox-Background")
+	local t = g_app.acceptedEntriesFrame:CreateTexture(nil,"BACKGROUND")
+	--t:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Factions.blp")
+	t:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background")
+	t:SetAllPoints(g_app.acceptedEntriesFrame)
+	--g_app.acceptedEntriesFrame.texture:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background")
+	--g_app.acceptedEntriesFrame.texture:SetPoint("TOPLEFT", g_app.acceptedEntriesFrame)
+	--g_app.acceptedEntriesFrame.texture:SetPoint("BOTTOMRIGHT", g_app.acceptedEntriesFrame, "BOTTOMRIGHT", 0, 0)
+
+	g_app.acceptedEntriesFrame.texture = t
+	g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", GBC_Frame, "BOTTOMLEFT",0,0)
+	g_app.acceptedEntriesFrame:Show()
+
+	g_app.acceptedEntriesFrame.text = GBC_Frame:CreateFontString(nil, "ARTWORK")
+	g_app.acceptedEntriesFrame.text:SetPoint("TOPLEFT", GBC_AcceptEntries, 4, -1)
+	g_app.acceptedEntriesFrame.text:SetJustifyH("LEFT")
+	g_app.acceptedEntriesFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE, MONOCHROME")
+	g_app.acceptedEntriesFrame.text:SetText(name)
+		--g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", "GBC_Frame", "TOPLEFT", 0, 0)
+		--g_app.acceptedEntriesFrame:SetPoint("BOTTOMRIGHT", "GBC_Frame", "BOTTOMRIGHT", cfg.inset, -cfg.inset)
+	--end
+end
+
+function RemovePlayer(name)
+	local charname, realmname = strsplit("-",name);
+	local insname = strlower(charname);
+
+	for i=1, table.getn(GBC.strings) do
+		if GBC.strings[i] ~= nil then
+		  	if strlower(GBC.strings[i]) == strlower(insname) then
+				table.remove(GBC.strings, i)
+				g_round.totalRolls = g_round.totalRolls - 1;
+
+				DebugWrite(format("Removed player %s", insname))
+			end
+		end
+	end
+	
+	if (GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 0) then
+		GBC_LASTCALL_Button:Disable();
+	end
+	
+	if g_round.totalRolls == 1 then
+		GBC_AcceptEntries_Button:Enable();
+		GBC_AcceptEntries_Button:SetText("Open Entry");
+	end
+end
+
 --TODO list remaining players to roll
 function ListRemainingPlayers()
 	for i=1, table.getn(GBC.strings) do
@@ -751,61 +856,6 @@ function ListBannedPlayers()
 		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
 	end
 end
-
-function AddPlayer(name)
-	if IsBanned(name) then
-		ChatMsg(format("%s: You're banned from the casino! Get outta here ya degenerate.", name))
-		return	
-	end
-
-	local charname, realmname = strsplit("-",name);
-	local insname = strlower(charname);
-	
-	if (insname ~= nil or insname ~= "") then
-		local found = 0;
-		for i=1, table.getn(GBC.strings) do
-		  	if GBC.strings[i] == insname then
-				found = 1;
-			end
-		end
-		if found == 0 then
-			table.insert(GBC.strings, insname)
-			g_round.totalRolls = g_round.totalRolls+1
-		end
-	end
-	
-	if not GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 1 then
-		GBC_LASTCALL_Button:Enable();
-	end
-	
-	if g_round.totalRolls == 2 then
-		GBC_AcceptEntries_Button:Disable();
-		GBC_AcceptEntries_Button:SetText("Open Entry");
-	end
-end
-
-function RemovePlayer(name)
-	local charname, realmname = strsplit("-",name);
-	local insname = strlower(charname);
-	for i=1, table.getn(GBC.strings) do
-		if GBC.strings[i] ~= nil then
-		  	if strlower(GBC.strings[i]) == strlower(insname) then
-				table.remove(GBC.strings, i)
-				g_round.totalRolls = g_round.totalRolls - 1;
-			end
-		end
-	end
-	
-	if (GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 0) then
-		GBC_LASTCALL_Button:Disable();
-	end
-	
-	if g_round.totalRolls == 1 then
-		GBC_AcceptEntries_Button:Enable();
-		GBC_AcceptEntries_Button:SetText("Open Entry");
-	end
-end
-
 
 function IsBanned(name)
 	local charname, realmname = strsplit("-",name);
@@ -901,7 +951,7 @@ end
 
 function ChatMsg(msg, chatType, language, channel)
 	chatType = chatType or g_app.currentChatMethod
-	channelnum = GetChannelName(channel or g_app.channelName)
+	channelnum = GetChannelName(channel or g_app.customChannel)
 	SendChatMessage(msg, chatType, language, channelnum)
 end
 
@@ -912,4 +962,10 @@ function DebugMode(enable)
 	end
 	WriteMsg("","",format("Debug mode <%s>", strupper(msg)))
 	g_app.debug = enable
+end
+
+function DebugWrite(msg)
+	if g_app.debug then
+		WriteMsg("","","[DEBUG]"..msg)
+	end
 end
