@@ -15,7 +15,8 @@ g_app = {
 	},
 	currentChatMethod = "RAID",
 	lastRoll = 100,
-	showMinimap = false
+	showMinimap = false,
+	debug = false
 }
 
 g_roundDefaults = {
@@ -38,9 +39,6 @@ g_roundDefaults = {
 
 g_round = g_roundDefaults
 g_rollCmd = SLASH_RANDOM1:upper()
-
---TEMP
-table = {}
 
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
@@ -79,19 +77,20 @@ function GBC_SlashCmd(msg)
 	local msg = msg:lower();
 	
 	if (msg == "" or msg == nil) then
-	    Print("", "", "~Following commands for GreybeardsCasino~");
-		Print("", "", "show - Shows the frame");
-		Print("", "", "hide - Hides the frame");
-		Print("", "", "channel - Change the custom channel for gambling");
-		Print("", "", "reset - Resets the AddOn");
-		Print("", "", "fullstats - list full stats");
-		Print("", "", "resetstats - Resets the stats");
-		Print("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]");
-		Print("", "", "minimap - Toggle minimap show/hide");
-		Print("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to");
-		Print("", "", "ban - Ban's the user from being able to roll")
-		Print("", "", "unban - Unban's the user")
-		Print("", "", "listban - Shows ban list")
+	    WriteMsg("", "", "~Following commands for GreybeardsCasino~");
+		WriteMsg("", "", "show - Shows the frame");
+		WriteMsg("", "", "hide - Hides the frame");
+		WriteMsg("", "", "channel - Change the custom channel for gambling");
+		WriteMsg("", "", "reset - Resets the AddOn");
+		WriteMsg("", "", "fullstats - list full stats");
+		WriteMsg("", "", "resetstats - Resets the stats");
+		WriteMsg("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]");
+		WriteMsg("", "", "minimap - Toggle minimap show/hide");
+		WriteMsg("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to");
+		WriteMsg("", "", "ban - Ban's the user from being able to roll")
+		WriteMsg("", "", "unban - Unban's the user")
+		WriteMsg("", "", "listban - Shows ban list")
+		WriteMsg("", "", "debug {enable|disable}")
 		return
 	end
 	
@@ -117,7 +116,7 @@ function GBC_SlashCmd(msg)
 	end
 	
 	if (msg == "resetstats") then
-		Print("", "", "|cffffff00GCG stats have now been reset")
+		WriteMsg("", "", "|cffffff00GCG stats have now been reset")
 		ResetStats()
 		return
 	end
@@ -157,8 +156,18 @@ function GBC_SlashCmd(msg)
 		return
 	end
 
+	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,13) == "enable") then
+		DebugMode(true)
+		return
+	end
+
+	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,14) == "disable") then
+		DebugMode(false)
+		return
+	end
+
 	--Fallthrough
-	Print("", "", "|cffffff00Invalid argument for command /cg");
+	WriteMsg("", "", "|cffffff00Invalid argument for command /cg");
 end
 
 SLASH_GBC1 = "/GreyCasino";
@@ -174,7 +183,7 @@ local function OptionsFormatter(text, prefix)
 end
 
 function GBC_OnEvent(self, event, ...)
-	if (event == "PLAYER_ENTERING_WORLD") then
+	if event == "PLAYER_ENTERING_WORLD" then
 		--TODO remove
 		if(not GBC) then
 			GBC = {
@@ -235,10 +244,10 @@ function GBC_OnEvent(self, event, ...)
 	end
 	
 	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and GBC["chat"] == 4 then
-		local msg,_,_,_,name,_,_,_,channel = ...
-		if channel == g_app.channelName then
-			ParseChatMsg(msg, name)
-		end
+		--local msg,_,_,_,name,_,_,_,channel = ...
+		--if channel == g_app.channelName then
+		--	ParseChatMsg(msg, name)
+		--end
 	end
 
 	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and GBC["chat"] == 5 then
@@ -294,7 +303,7 @@ function GBC_Reset()
 	GBC_ResetUI()
 	
 	GBC_AcceptEntries_Button:SetText("Open Entry");
-	Print("", "", "|cffffff00GCG has now been reset");
+	WriteMsg("", "", "|cffffff00GCG has now been reset");
 end
 
 function GBC_ResetUI()
@@ -733,7 +742,7 @@ end
 
 function ListBannedPlayers()
 	local bancnt = 0;
-	Print("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
+	WriteMsg("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
 	for i=1, table.getn(GBC.bans) do
 		bancnt = 1;
 		DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
@@ -818,19 +827,19 @@ function AddBannedPlayer(name)
 	local insname = strlower(charname);
 	
 	if (insname ~= nil or insname ~= "") then
-		Print("", "", "|cffffff00Error: No name provided.");
+		WriteMsg("", "", "|cffffff00Error: No name provided.");
 		return
 	end
 	
 	for i=1, table.getn(GBC.bans) do
 		if GBC.bans[i] == insname then
-			Print("", "", "|cffffff00Unable to add to ban list - user already banned.");
+			WriteMsg("", "", "|cffffff00Unable to add to ban list - user already banned.");
 			return
 		end
 	end
 	
 	table.insert(GBC.bans, insname)
-	Print("", "", "|cffffff00User is now banned!");
+	WriteMsg("", "", "|cffffff00User is now banned!");
 	local banMsg = strjoin(" ", "", "User Banned from rolling! -> ",insname, "!")
 	DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", banMsg));
 end
@@ -842,12 +851,12 @@ function RemoveBannedPlayer(name)
 		for i=1, table.getn(GBC.bans) do
 			if strlower(GBC.bans[i]) == strlower(insname) then
 				table.remove(GBC.bans, i)
-				Print("", "", "|cffffff00User removed from ban successfully.");
+				WriteMsg("", "", "|cffffff00User removed from ban successfully.");
 				return;
 			end
 		end
 	else
-		Print("", "", "|cffffff00Error: No name provided.");
+		WriteMsg("", "", "|cffffff00Error: No name provided.");
 	end
 end
 
@@ -883,15 +892,24 @@ function RemoveTiedPlayer(name, tietable)
       end
 end
 
-local function Print(pre, red, text)
+function WriteMsg(pre, red, text)
 	if red == "" then 
-		red = "/GBC" 
+		red = "/gbc" 
 	end
 	DEFAULT_CHAT_FRAME:AddMessage(pre..GREEN_FONT_COLOR_CODE..red..FONT_COLOR_CODE_CLOSE..": "..text)
 end
 
-local function ChatMsg(msg, chatType, language, channel)
+function ChatMsg(msg, chatType, language, channel)
 	chatType = chatType or g_app.currentChatMethod
 	channelnum = GetChannelName(channel or g_app.channelName)
 	SendChatMessage(msg, chatType, language, channelnum)
+end
+
+function DebugMode(enable)
+	msg = "enabled"
+	if not enable then
+		msg = "disabled"
+	end
+	WriteMsg("","",format("Debug mode <%s>", strupper(msg)))
+	g_app.debug = enable
 end
