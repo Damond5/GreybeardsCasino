@@ -778,39 +778,6 @@ function AddPlayer(name)
 		GBC_AcceptEntries_Button:Disable();
 		GBC_AcceptEntries_Button:SetText("Open Entry");
 	end
-
-	if g_app.debug then
-		--TODO Update UI call, remove UI functions at this level
-		if g_app.acceptedEntriesFrame == nil then
-			DebugWrite("Creating AcceptedPlayerFrame")
-			g_app.acceptedEntriesFrame = CreateFrame("Frame", "GBC_AcceptEntries", GBC_Frame)
-		end
-
-		g_app.acceptedEntriesFrame:SetFrameStrata("BACKGROUND")
-		g_app.acceptedEntriesFrame:SetWidth(128) 
-		g_app.acceptedEntriesFrame:SetHeight(128) 
-		--g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0,0)
-		--g_app.acceptedEntriesFrame:SetBackground("Interface\\DialogFrame\\UI-DialogBox-Background")
-		local t = g_app.acceptedEntriesFrame:CreateTexture(nil,"BACKGROUND")
-		--t:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Factions.blp")
-		t:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background")
-		t:SetAllPoints(g_app.acceptedEntriesFrame)
-		--g_app.acceptedEntriesFrame.texture:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background")
-		--g_app.acceptedEntriesFrame.texture:SetPoint("TOPLEFT", g_app.acceptedEntriesFrame)
-		--g_app.acceptedEntriesFrame.texture:SetPoint("BOTTOMRIGHT", g_app.acceptedEntriesFrame, "BOTTOMRIGHT", 0, 0)
-
-		g_app.acceptedEntriesFrame.texture = t
-		g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", GBC_Frame, "BOTTOMLEFT",0,0)
-		g_app.acceptedEntriesFrame:Show()
-
-		g_app.acceptedEntriesFrame.text = GBC_Frame:CreateFontString(nil, "ARTWORK")
-		g_app.acceptedEntriesFrame.text:SetPoint("TOPLEFT", GBC_AcceptEntries, 4, -1)
-		g_app.acceptedEntriesFrame.text:SetJustifyH("LEFT")
-		g_app.acceptedEntriesFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE, MONOCHROME")
-		g_app.acceptedEntriesFrame.text:SetText(name)
-		--g_app.acceptedEntriesFrame:SetPoint("TOPLEFT", "GBC_Frame", "TOPLEFT", 0, 0)
-		--g_app.acceptedEntriesFrame:SetPoint("BOTTOMRIGHT", "GBC_Frame", "BOTTOMRIGHT", cfg.inset, -cfg.inset)
-	end
 end
 
 function RemovePlayer(name)
