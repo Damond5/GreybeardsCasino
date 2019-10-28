@@ -483,7 +483,8 @@ function GBC_OnClickACCEPTENTRIES()
 		g_round.currentLowRoll = g_round.currentStakes + 1
 		g_round.tielow = g_round.currentStakes + 1
 		
-		ChatMsg(format(".:The Greybeard$ Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
+		ChatMsg(format(".:The Greybeards Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
+		ChatMsg(".:Lowest roll pays Highest roll the difference between rolls:.")
 		ChatMsg(format(".:Players will  /roll %s  // Type %s to Join  // Type %s to withdraw:.", 
 						GBC_EditBox:GetText(), 
 						g_app.chatEnterMsg, 
