@@ -30,7 +30,7 @@ Loser pays the Winner the difference between their rolls.
  
 ## Available Chat Methods
 
-Custom Channel: GamblinGreybeards
+Custom Channel: GreybeardsCasino
 
 Party
 
