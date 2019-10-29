@@ -205,26 +205,26 @@ function GBC_OnEvent(self, event, ...)
 		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
 	
 		--TODO UI initialization
-		GBC_EditBox:SetJustifyH("CENTER");
-		GBC_EditBox:SetText(g_app.lastRoll);
+		--GBC_EditBox:SetJustifyH("CENTER");
+		--GBC_EditBox:SetText(g_app.lastRoll);
 
 		--SetChatTarget
 		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-		GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
+		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
 
 		--MiniMap
-		if g_app.showMinimap then
-			GBC_MinimapButton:Show()
-		else
-			GBC_MinimapButton:Hide()
-		end
+		--if g_app.showMinimap then
+		--	GBC_MinimapButton:Show()
+		--else
+		--	GBC_MinimapButton:Hide()
+		--end
 
 		--TODO move to ?? idk
-		if(GBC["active"] == 1) then
-			GBC_Frame:Show();
-		else
-			GBC_Frame:Hide();
-		end
+		--if(GBC["active"] == 1) then
+		--	GBC_Frame:Show();
+		--else
+		--	GBC_Frame:Hide();
+		--end
 	end
 
 	-- CHAT PARSING 
@@ -263,8 +263,8 @@ function GBC_OnEvent(self, event, ...)
 end
 
 function GBC_EditBox_OnLoad()
-    GBC_EditBox:SetNumeric(true);
-	GBC_EditBox:SetAutoFocus(false);
+    --GBC_EditBox:SetNumeric(true);
+	--GBC_EditBox:SetAutoFocus(false);
 end
 
 function GBC_EditBox_OnEnterPressed()
@@ -284,7 +284,7 @@ function GBC_OnClickCHAT()
 	GBC["chat"] = (GBC["chat"] % #g_app.chatMethods) + 1
 	g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
 	
-	GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
+	--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
 
 	if g_app.currentChatMethod == "CHANNEL" then
 		WriteMsg("","",string.format("Custom channel set to: %s", g_app.customChannel))
@@ -307,20 +307,20 @@ function GBC_Reset()
 	
 	GBC_ResetUI()
 	
-	GBC_AcceptEntries_Button:SetText("Open Entry");
+	--GBC_AcceptEntries_Button:SetText("Open Entry");
 	WriteMsg("", "", "|cffffff00GCG has now been reset");
 end
 
 function GBC_ResetUI()
-	GBC_ROLL_Button:Disable();
-	GBC_AcceptEntries_Button:Enable();
-	GBC_LASTCALL_Button:Disable();
-	GBC_CHAT_Button:Enable();
+	--GBC_ROLL_Button:Disable();
+	--GBC_AcceptEntries_Button:Enable();
+	--GBC_LASTCALL_Button:Disable();
+	--GBC_CHAT_Button:Enable();
 
-	if g_app.acceptedEntriesFrame ~= nil then
-		g_app.acceptedEntriesFrame.text:SetText("")
-		g_app.acceptedEntriesFrame:Hide()
-	end
+	--if g_app.acceptedEntriesFrame ~= nil then
+	--	g_app.acceptedEntriesFrame.text:SetText("")
+	--	g_app.acceptedEntriesFrame:Hide()
+	--end
 end
 
 function GBC_ResetCmd()
@@ -452,7 +452,7 @@ function GBC_OnClickROLL()
 			ListRemainingPlayers();
 		end
 
-		GBC_EditBox:ClearFocus();
+		--GBC_EditBox:ClearFocus();
 	end
 
 	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
@@ -462,39 +462,46 @@ end
 
 function GBC_OnClickLASTCALL()
 	ChatMsg("Last Call to join!");
-	GBC_EditBox:ClearFocus();
-	GBC_LASTCALL_Button:Disable();
-	GBC_ROLL_Button:Enable();
+	--GBC_EditBox:ClearFocus();
+	--GBC_LASTCALL_Button:Disable();
+	--GBC_ROLL_Button:Enable();
 end
 
 function GBC_OnClickACCEPTENTRIES()
-	if GBC_EditBox:GetText() ~= "" and GBC_EditBox:GetText() ~= g_app.chatEnterMsg then
+	--if GBC_EditBox:GetText() ~= "" and GBC_EditBox:GetText() ~= g_app.chatEnterMsg then
+	if true then
 		GBC_Reset()
 		
-		GBC_ROLL_Button:Disable()
-		GBC_LASTCALL_Button:Disable()
-		GBC_AcceptEntries_Button:SetText("New Game")
-		GBC_EditBox:ClearFocus()
-		g_app.lastRoll = GBC_EditBox:GetText()
+		--GBC_ROLL_Button:Disable()
+		--GBC_LASTCALL_Button:Disable()
+		--GBC_AcceptEntries_Button:SetText("New Game")
+		--GBC_EditBox:ClearFocus()
+		--g_app.lastRoll = GBC_EditBox:GetText()
 		
+		--TODO temp until we have a text box
+		local stake = 100
+		g_app.lastRoll = stake
 		g_round.acceptEntries = true
-		g_round.currentStakes = tonumber(GBC_EditBox:GetText())
+		g_round.currentStakes = stake --tonumber(GBC_EditBox:GetText())
 		g_round.currentLowRoll = g_round.currentStakes + 1
 		g_round.tielow = g_round.currentStakes + 1
 		
 		ChatMsg(format(".:The Greybeards Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
 		ChatMsg(".:Hi/Lo - Lowest roller pays Highest roller the difference between rolls:.")
 		ChatMsg(format(".:Players will  /roll %s  // Type %s to Join  // Type %s to withdraw:.", 
-						GBC_EditBox:GetText(), 
+						--GBC_EditBox:GetText(), 
+						stake,
 						g_app.chatEnterMsg, 
 						g_app.chatWithdrawMsg))
-	else
-		message("Please enter a number to roll from.", chatmethod)
+	--else
+		--TODO remove, this does nothing
+		--message("Please enter a number to roll from.", chatmethod)
 	end
 end
 
 function GBC_OnClickRoll()
-	hash_SlashCmdList[g_rollCmd](GBC_EditBox:GetText())
+	hash_SlashCmdList[g_rollCmd](g_round.currentStakes)
+	--hash_SlashCmdList[g_rollCmd](GBC_EditBox:GetText())
 end
 
 function GBC_OnClickRoll1()
@@ -504,54 +511,54 @@ end
 function ToggleFrame(show)
 	g_app.hidden = not show
 	
-	if g_app.hidden then
-		GBC_Frame:Hide()
-	else
-		GBC_Frame:Show()
-	end
+	--if g_app.hidden then
+	--	GBC_Frame:Hide()
+	--else
+	--	GBC_Frame:Show()
+	--end
 end
 
 function ToggleMinimap()
 	g_app.showMinimap = not g_app.showMinimap
 
-	if g_app.showMinimap then
-		GBC_MinimapButton:Show()
-	else
-		GBC_MinimapButton:Hide()
-	end
+	--if g_app.showMinimap then
+	--	GBC_MinimapButton:Show()
+	--else
+	--	GBC_MinimapButton:Hide()
+	--end
 end
 
-GBC_Settings = {
-	MinimapPos = 75
-}
+--GBC_Settings = {
+--	MinimapPos = 75
+--}
 -- ** do not call from the mod's OnLoad, VARIABLES_LOADED or later is fine. **
 function GBC_MinimapButton_Reposition()
-	GBC_MinimapButton:SetPoint(
-		"TOPLEFT",
-		"Minimap",
-		"TOPLEFT",
-		52-(80*cos(GBC_Settings.MinimapPos)),
-		(80*sin(GBC_Settings.MinimapPos))-52)
+	--GBC_MinimapButton:SetPoint(
+	--	"TOPLEFT",
+	--	"Minimap",
+	--	"TOPLEFT",
+	--	52-(80*cos(GBC_Settings.MinimapPos)),
+	--	(80*sin(GBC_Settings.MinimapPos))-52)
 end
 
 --TODO drag function does not work
 function GBC_MinimapButton_DraggingFrame_OnUpdate()
-	local xpos,ypos = GetCursorPosition()
-	local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
+	--local xpos,ypos = GetCursorPosition()
+	--local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
 
-	xpos = xmin-xpos/UIParent:GetScale()+70
-	ypos = ypos/UIParent:GetScale()-ymin-70
+	--xpos = xmin-xpos/UIParent:GetScale()+70
+	--ypos = ypos/UIParent:GetScale()-ymin-70
 
-	GBC_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
-	GBC_MinimapButton_Reposition()
+	--GBC_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
+	--GBC_MinimapButton_Reposition()
 end
 
 
 function GBC_MinimapButton_OnClick()
-	DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
+	--DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
 end
 
-function ConvertRollToGold(value)
+local function ConvertRollToGold(value)
 	local tempValue = tonumber(value)
 	silver = tempValue % 100
 	tempValue = math.floor(tempValue / 100)
@@ -596,8 +603,8 @@ function ReportResults()
 	
 	--Reset Game
 	GBC_Reset();
-	GBC_AcceptEntries_Button:SetText("Open Entry");
-	GBC_CHAT_Button:Enable();
+	--GBC_AcceptEntries_Button:SetText("Open Entry");
+	--GBC_CHAT_Button:Enable();
 end
 
 function Tiebreaker()
@@ -605,10 +612,10 @@ function Tiebreaker()
 	g_round.totalRolls = 0;
 	g_round.currentTie = 1;
 	if table.getn(GBC.lowtie) == 1 then
-		GBC.lowtie = {};
+		GBC.lowtie = {}; --TODO move to g_round
 	end
 	if table.getn(GBC.hightie) == 1 then
-		GBC.hightie = {};
+		GBC.hightie = {}; --TODO move to g_round
 	end
 	g_round.totalRolls = table.getn(GBC.lowtie) + table.getn(GBC.hightie);
 	g_round.tierolls = g_round.totalRolls;
@@ -621,18 +628,18 @@ function Tiebreaker()
 			g_round.currentHighBreak = 0;
 			g_round.tielow = g_round.currentStakes+1;
 			g_round.tiehigh = 0;
-			GBC.strings = GBC.lowtie;
-			GBC.lowtie = {};
-			GBC_OnClickROLL();
+			GBC.strings = GBC.lowtie; --TODO move to g_round
+			GBC.lowtie = {}; --TODO move to g_round
+			GBC_OnClickROLL(); --TODO local function
 		end
 		if table.getn(GBC.hightie) > 0  and table.getn(GBC.strings) == 0 then
 			g_round.currentLowBreak = 0;
 			g_round.currentHighBreak = 1;
 			g_round.tielow = g_round.currentStakes+1;
 			g_round.tiehigh = 0;
-			GBC.strings = GBC.hightie;
-			GBC.hightie = {};
-			GBC_OnClickROLL();
+			GBC.strings = GBC.hightie; --TODO move to g_round
+			GBC.hightie = {}; --TODO move to g_round
+			GBC_OnClickROLL(); --TODO local function
 		end
 	end
 end
@@ -770,14 +777,14 @@ function AddPlayer(name)
 		end
 	end
 	
-	if not GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 1 then
-		GBC_LASTCALL_Button:Enable();
-	end
+	--if not GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 1 then
+	--	GBC_LASTCALL_Button:Enable();
+	--end
 	
-	if g_round.totalRolls == 2 then
-		GBC_AcceptEntries_Button:Disable();
-		GBC_AcceptEntries_Button:SetText("Open Entry");
-	end
+	--if g_round.totalRolls == 2 then
+	--	GBC_AcceptEntries_Button:Disable();
+	--	GBC_AcceptEntries_Button:SetText("Open Entry");
+	--end
 
 	if false and g_app.debug then
 		--TODO Update UI call, remove UI functions at this level
@@ -829,14 +836,14 @@ function RemovePlayer(name)
 		end
 	end
 	
-	if (GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 0) then
-		GBC_LASTCALL_Button:Disable();
-	end
+	--if (GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 0) then
+	--	GBC_LASTCALL_Button:Disable();
+	--end
 	
-	if g_round.totalRolls == 1 then
-		GBC_AcceptEntries_Button:Enable();
-		GBC_AcceptEntries_Button:SetText("Open Entry");
-	end
+	--if g_round.totalRolls == 1 then
+	--	GBC_AcceptEntries_Button:Enable();
+	--	GBC_AcceptEntries_Button:SetText("Open Entry");
+	--end
 end
 
 --TODO list remaining players to roll
@@ -852,13 +859,14 @@ function ListBannedPlayers()
 	WriteMsg("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
 	for i=1, table.getn(GBC.bans) do
 		bancnt = 1;
-		DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
+		--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
 	end
 	if (bancnt == 0) then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
+		--DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
 	end
 end
 
+--TODO table contains
 function IsBanned(name)
 	local charname, realmname = strsplit("-",name);
 	local insname = strlower(charname);
@@ -892,8 +900,8 @@ function AddBannedPlayer(name)
 	
 	table.insert(GBC.bans, insname)
 	WriteMsg("", "", "|cffffff00User is now banned!");
-	local banMsg = strjoin(" ", "", "User Banned from rolling! -> ",insname, "!")
-	DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", banMsg));
+	--local banMsg = strjoin(" ", "", "User Banned from rolling! -> ",insname, "!")
+	--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", banMsg));
 end
 
 function RemoveBannedPlayer(name)
@@ -948,7 +956,7 @@ function WriteMsg(pre, red, text)
 	if red == "" then 
 		red = "/gbc" 
 	end
-	DEFAULT_CHAT_FRAME:AddMessage(pre..GREEN_FONT_COLOR_CODE..red..FONT_COLOR_CODE_CLOSE..": "..text)
+	--DEFAULT_CHAT_FRAME:AddMessage(pre..GREEN_FONT_COLOR_CODE..red..FONT_COLOR_CODE_CLOSE..": "..text)
 end
 
 function ChatMsg(msg, chatType, language, channel)

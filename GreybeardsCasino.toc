@@ -5,7 +5,7 @@
 ## Version: 0.1
 ## DefaultState: Disabled
 ## LoadOnDemand: 0
-## Notes: Gamble time. A fun way to lose gold. Or win it.
+## Notes: Role play as a degenerate gambler.
 ## SavedVariables: GreybeardsCasino
 
 GreybeardsCasino.xml
