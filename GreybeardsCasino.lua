@@ -428,18 +428,18 @@ end
 
 function GBC_OnClickROLL()
 	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
-	--if g_round.totalRolls > 0 and g_round.acceptRolls then
-	--	if table.getn(GBC.strings) ~= 0 then
-	--		ListRemainingPlayers()
-	--	end
-	--	return
-	--end
+	if g_round.totalRolls > 0 and g_round.acceptRolls then
+		if table.getn(GBC.strings) ~= 0 then
+			ListRemainingPlayers()
+		end
+		return
+	end
 
 	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
 		g_round.acceptEntries = false 
 		g_round.acceptRolls = true 
 		if (g_round.currentTie == 0) then 
-			ChatMsg("Roll now!")
+			ChatMsg(".:Greybeards Casino - Roll now:.")
 		end
 
 		if (g_round.currentLowBreak == 1) then
