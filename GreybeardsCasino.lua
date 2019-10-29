@@ -439,7 +439,7 @@ function GBC_OnClickROLL()
 		g_round.acceptEntries = false 
 		g_round.acceptRolls = true 
 		if (g_round.currentTie == 0) then 
-			ChatMsg(".:Greybeards Casino - Roll now:.")
+			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", currentStakes))
 		end
 
 		if (g_round.currentLowBreak == 1) then
@@ -455,7 +455,6 @@ function GBC_OnClickROLL()
 		GBC_EditBox:ClearFocus();
 	end
 
-	--TODO bypass this in debug mode
 	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
 		ChatMsg("Not enough Players!");
 	end
@@ -662,7 +661,7 @@ function ParseRoll(msg)
 		end
 		
 		if maxRoll == g_round.currentStakes then
-			if g_round.currentTie == 0 then
+			if g_round.currentTie == 0 then --TODO this needs to be a bool
 				if roll == g_round.currentHighRoll then
 					if table.getn(GBC.hightie) == 0 then
 						AddTiedPlayer(g_round.highName, GBC.hightie)
