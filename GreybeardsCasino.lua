@@ -779,7 +779,7 @@ function AddPlayer(name)
 		GBC_AcceptEntries_Button:SetText("Open Entry");
 	end
 
-	if g_app.debug then
+	if false and g_app.debug then
 		--TODO Update UI call, remove UI functions at this level
 		if g_app.acceptedEntriesFrame == nil then
 			DebugWrite("Creating AcceptedPlayerFrame")
