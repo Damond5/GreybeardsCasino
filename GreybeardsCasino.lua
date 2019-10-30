@@ -43,7 +43,7 @@ g_rollCmd = SLASH_RANDOM1:upper()
 
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.");
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
 
 	self:RegisterEvent("CHAT_MSG_RAID");
 	self:RegisterEvent("CHAT_MSG_CHANNEL");
@@ -60,6 +60,86 @@ function GBC_OnLoad(self)
     
 	GBC_ResetUI();
 end
+
+function GBC_OnEvent(self, event, ...)
+	if event == "PLAYER_ENTERING_WORLD" then
+		--TODO remove
+		if(not GBC) then
+			GBC = {
+				["chat"] = 1,
+				["strings"] = { },
+				["lowtie"] = { }, --TODO remove
+				["hightie"] = { }, --TODO remove
+				["bans"] = { },
+			}
+		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
+		elseif tostring(type(GBC["chat"])) ~= "number" then
+			GBC["chat"] = 1
+		end
+
+		if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
+		if(not GBC["joinstats"]) then 		GBC["joinstats"] 	= { }; end
+		if(not GBC["chat"]) then 			GBC["chat"] 		= 1; end
+		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
+	
+		--TODO UI initialization
+		--GBC_EditBox:SetJustifyH("CENTER");
+		--GBC_EditBox:SetText(g_app.lastRoll);
+
+		--SetChatTarget
+		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
+		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
+
+		--MiniMap
+		--if g_app.showMinimap then
+		--	GBC_MinimapButton:Show()
+		--else
+		--	GBC_MinimapButton:Hide()
+		--end
+
+		--TODO move to ?? idk
+		--if(GBC["active"] == 1) then
+		--	GBC_Frame:Show();
+		--else
+		--	GBC_Frame:Hide();
+		--end
+	end
+
+	-- CHAT PARSING 
+	--TODO move AcceptOnes logic to parse chat. Or jut remove this global
+	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and GBC["chat"] == 1) then
+		local msg, _,_,_,name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+	if ((event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_PARTY")and g_round.acceptEntries and GBC["chat"] == 2) then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+    if ((event == "CHAT_MSG_GUILD_LEADER" or event == "CHAT_MSG_GUILD")and g_round.acceptEntries and GBC["chat"] == 3) then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+	
+	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and GBC["chat"] == 4 then
+		local msg,_,_,_,name,_,_,_,channel = ...
+		if channel == g_app.customChannel then
+			ParseChatMsg(msg, name)
+		end
+	end
+
+	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and GBC["chat"] == 5 then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+	if event == "CHAT_MSG_SYSTEM" and g_round.acceptRolls then
+		local msg = ...
+		ParseRoll(msg);
+	end
+end
+
 
 --TODO cleanup slop
 local EventFrame=CreateFrame("Frame");
@@ -183,84 +263,7 @@ local function OptionsFormatter(text, prefix)
 	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
 end
 
-function GBC_OnEvent(self, event, ...)
-	if event == "PLAYER_ENTERING_WORLD" then
-		--TODO remove
-		if(not GBC) then
-			GBC = {
-				["chat"] = 1,
-				["strings"] = { },
-				["lowtie"] = { }, --TODO remove
-				["hightie"] = { }, --TODO remove
-				["bans"] = { },
-			}
-		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
-		elseif tostring(type(GBC["chat"])) ~= "number" then
-			GBC["chat"] = 1
-		end
 
-		if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
-		if(not GBC["joinstats"]) then 		GBC["joinstats"] 	= { }; end
-		if(not GBC["chat"]) then 			GBC["chat"] 		= 1; end
-		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
-	
-		--TODO UI initialization
-		--GBC_EditBox:SetJustifyH("CENTER");
-		--GBC_EditBox:SetText(g_app.lastRoll);
-
-		--SetChatTarget
-		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
-
-		--MiniMap
-		--if g_app.showMinimap then
-		--	GBC_MinimapButton:Show()
-		--else
-		--	GBC_MinimapButton:Hide()
-		--end
-
-		--TODO move to ?? idk
-		--if(GBC["active"] == 1) then
-		--	GBC_Frame:Show();
-		--else
-		--	GBC_Frame:Hide();
-		--end
-	end
-
-	-- CHAT PARSING 
-	--TODO move AcceptOnes logic to parse chat. Or jut remove this global
-	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and GBC["chat"] == 1) then
-		local msg, _,_,_,name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-	if ((event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_PARTY")and g_round.acceptEntries and GBC["chat"] == 2) then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-    if ((event == "CHAT_MSG_GUILD_LEADER" or event == "CHAT_MSG_GUILD")and g_round.acceptEntries and GBC["chat"] == 3) then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-	
-	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and GBC["chat"] == 4 then
-		local msg,_,_,_,name,_,_,_,channel = ...
-		if channel == g_app.customChannel then
-			ParseChatMsg(msg, name)
-		end
-	end
-
-	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and GBC["chat"] == 5 then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-	if event == "CHAT_MSG_SYSTEM" and g_round.acceptRolls then
-		local msg = ...
-		ParseRoll(msg);
-	end
-end
 
 function GBC_EditBox_OnLoad()
     --GBC_EditBox:SetNumeric(true);
