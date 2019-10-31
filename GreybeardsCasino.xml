@@ -54,6 +54,20 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
 						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+						<Frames>
+							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Stats">
+								<Anchors>
+									<Anchor relativeTo="GBC_Admin" relativePoint="RIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Admin" relativePoint="LEFT" point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+							<Button name="GBC_Btn_StatsReset" inherits="OptionsButtonTemplate" text="Reset">
+								<Anchors>
+									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+						</Frames>
 					</Frame>
 				</Frames>
 			</Frame>
