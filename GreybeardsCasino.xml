@@ -25,19 +25,64 @@
 		<Frames>
 			<Frame name="GBC_Header">
 				<Size y="75"/>
-				<Anchors relativepoint="TOPLEFT">
-					<Anchor point="TOPLEFT"/>
-					<Anchor point="TOPRIGHT"/>
+				<Anchors >
+					<Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
+					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
 				</Anchors>
-				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background"/>
+				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
 			</Frame>
-			<Frame name="GBC_GamePanel">
+			<Frame name="GBC_Panel_Upper">
 				<Size y="175"/>
-				<Anchors relativepoint="BOTTOMLEFT">
-					<Anchor point="TOPLEFT"/>
-					<Anchor point="BOTTOMRIGHT"/>
+				<Anchors>
+					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 				</Anchors>
-				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground"/>
+				<Frames>
+					<Frame name="GBC_GameModes">
+						<Size x="225"/>
+						<Anchors>
+							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+						</Anchors>
+						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+					</Frame>
+					<Frame name="GBC_Admin">
+						<Anchors>
+							<Anchor relativeTo="GBC_GameModes" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_GameModes" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+						</Anchors>
+						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+					</Frame>
+				</Frames>
+			</Frame>
+			<Frame name="GBC_Panel_Lower">
+				<Anchors>
+					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+				</Anchors>
+				<Frames>
+					<Frame name="GBC_Controls">
+						<Size x="225"/>
+						<Anchors>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+						</Anchors>
+						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+					</Frame>
+					<Frame name="GBC_Status">
+						<Anchors>
+							<Anchor relativeTo="GBC_Controls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_Controls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+						</Anchors>
+						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+					</Frame>
+				</Frames>
 			</Frame>
 		</Frames>
 	</Frame>
