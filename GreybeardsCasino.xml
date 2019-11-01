@@ -2,7 +2,7 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
 	xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="GreybeardsCasino.lua" />
-	<Frame name="GBC_Root" parent="UIParent" toplevel="true" movable="true">
+	<Frame name="GBC_Root" parent="UIParent" movable="true">
 		<Scripts>
 			<OnLoad>
 				GBC_OnLoad(self)
@@ -16,27 +16,47 @@
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border">
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
 			<BackgroundInsets left="11" right="12" top="12" bottom="11" />
 		</Backdrop>
 		<Layers>
 			
 		</Layers>
 		<Frames>
+			<Button name="GBC_CloseWindow" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GBC_CloseFrame()
+					</OnClick>
+				</Scripts>
+			</Button>
 			<Frame name="GBC_Header">
-				<Size y="75"/>
+				<Size y="60"/>
 				<Anchors >
 					<Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
 				</Anchors>
-				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+				<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="GreybeardsCasinoBanner" inherits="GameFontNormal" text="Greybeards Casino">
+							<Anchors>
+								<Anchor relativeTo="GBC_Header" relativePoint="CENTER" point="CENTER"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
 			</Frame>
 			<Frame name="GBC_Panel_Upper">
-				<Size y="175"/>
+				<Size y="100"/>
 				<Anchors>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 				</Anchors>
+				<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
 				<Frames>
 					<Frame name="GBC_GameModes">
 						<Size x="225"/>
@@ -44,7 +64,6 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
 					</Frame>
 					<Frame name="GBC_Admin">
 						<Anchors>
@@ -53,19 +72,39 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
 						<Frames>
-							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Stats">
+							<Button name="GBC_Btn_ChatBroadcast" inherits="OptionsButtonTemplate" text="Broadcast to: Raid">
 								<Anchors>
-									<Anchor relativeTo="GBC_Admin" relativePoint="RIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Admin" relativePoint="LEFT" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Admin" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Admin" relativePoint="TOPLEFT" point="TOPLEFT"/>
 								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_ChatBroadcast_OnClick()
+									</OnClick>
+								</Scripts>
 							</Button>
-							<Button name="GBC_Btn_StatsReset" inherits="OptionsButtonTemplate" text="Reset">
+							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Display Stats">
+								<Anchors>
+									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_StatsDisplay_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="GBC_Btn_StatsReset" inherits="OptionsButtonTemplate" text="Reset Stats">
 								<Anchors>
 									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_StatsReset_OnClick()
+									</OnClick>
+								</Scripts>
 							</Button>
 						</Frames>
 					</Frame>
@@ -79,22 +118,76 @@
 					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 				</Anchors>
 				<Frames>
-					<Frame name="GBC_Controls">
+					<Frame name="GBC_RoundControls">
 						<Size x="225"/>
 						<Anchors>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
+						<Frames>
+							<Frame name="GBC_Label_Stakes" text="Stakes">
+								<Size y="14"/>
+								<FontString inherits="ChatFontNormal"/>
+								<Anchors>
+									<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPLEFT" point="TOPLEFT"/>
+								</Anchors>
+							</Frame>
+							<EditBox name="GBC_EditBox_Stakes" letters="7">
+								<Scripts>
+									<OnLoad>
+										GBC_EditBox_Stakes_OnLoad()
+									</OnLoad>
+									<OnEnterPressed>
+										GBC_EditBox_Stakes_OnEnterPressed()
+									</OnEnterPressed>
+									<OnEscapePressed>
+										self:ClearFocus()
+									</OnEscapePressed>
+								</Scripts>
+								<Size y="26"/>
+								<FontString inherits="ChatFontNormal"/>
+								<Anchors>
+									<Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+									 	<Texture file="Interface\ChatFrame\UI-ChatInputBorder-LEFT">
+							                <Anchors>
+							                    <Anchor point="RIGHT"/>
+							                </Anchors>
+						            	</Texture>
+									</Layer>
+								</Layers>
+							</EditBox>
+							<Button name="GBC_Btn_RoundNext" inherits="OptionsButtonTemplate" text="Start Round">
+								<Anchors>
+									<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+							</Button>
+						</Frames>
 					</Frame>
 					<Frame name="GBC_Status">
 						<Anchors>
-							<Anchor relativeTo="GBC_Controls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-							<Anchor relativeTo="GBC_Controls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+							<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
-						<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border"/>
+						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
+						<Frames>
+							<ScrollFrame>
+								<Anchors>
+									<Anchor relativeTo="GBC_Status" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="TOPLEFT" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMLEFT" point="BOTTOLEFT"/>
+								</Anchors>
+							</ScrollFrame>
+						</Frames>
 					</Frame>
 				</Frames>
 			</Frame>

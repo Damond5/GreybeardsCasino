@@ -21,6 +21,8 @@ g_app = {
 }
 
 g_roundDefaults = {
+	currentPhase = 0,
+	maxPhases = 3,
 	acceptEntries = false,
 	acceptRolls = false,
 	totalRolls = 0,
@@ -39,29 +41,30 @@ g_roundDefaults = {
 }
 
 g_round = g_roundDefaults
-g_rollCmd = SLASH_RANDOM1:upper()
+--g_rollCmd = SLASH_RANDOM1:upper()
 
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
 
-	self:RegisterEvent("CHAT_MSG_RAID");
-	self:RegisterEvent("CHAT_MSG_CHANNEL");
-	self:RegisterEvent("CHAT_MSG_RAID_LEADER");
-	self:RegisterEvent("CHAT_MSG_PARTY_LEADER");
-	self:RegisterEvent("CHAT_MSG_PARTY");
-	self:RegisterEvent("CHAT_MSG_GUILD");
-	self:RegisterEvent("CHAT_MSG_SAY");
-	self:RegisterEvent("CHAT_MSG_SYSTEM");
-	self:RegisterEvent("PLAYER_ENTERING_WORLD");
+	--self:RegisterEvent("CHAT_MSG_RAID");
+	--self:RegisterEvent("CHAT_MSG_CHANNEL");
+	--self:RegisterEvent("CHAT_MSG_RAID_LEADER");
+	--self:RegisterEvent("CHAT_MSG_PARTY_LEADER");
+	--self:RegisterEvent("CHAT_MSG_PARTY");
+	--self:RegisterEvent("CHAT_MSG_GUILD");
+	--self:RegisterEvent("CHAT_MSG_SAY");
+	--self:RegisterEvent("CHAT_MSG_SYSTEM");
+	--self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	
 	--TODO broken
-	self:RegisterForDrag("LeftButton");
+	--self:RegisterForDrag("LeftButton");
     
-	GBC_ResetUI();
+	--GBC_ResetUI();
 end
 
 function GBC_OnEvent(self, event, ...)
+	print(event)
 	if event == "PLAYER_ENTERING_WORLD" then
 		--TODO remove
 		if(not GBC) then
@@ -72,9 +75,10 @@ function GBC_OnEvent(self, event, ...)
 				["hightie"] = { }, --TODO remove
 				["bans"] = { },
 			}
+		--TODO cleanup crossgambling relic
 		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
-		elseif tostring(type(GBC["chat"])) ~= "number" then
-			GBC["chat"] = 1
+		--elseif tostring(type(GBC["chat"])) ~= "number" then
+		--	GBC["chat"] = 1
 		end
 
 		if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
@@ -142,19 +146,20 @@ end
 
 
 --TODO cleanup slop
-local EventFrame=CreateFrame("Frame");
+--local EventFrame=CreateFrame("Frame");
 -- Need to register an event to receive it
-EventFrame:RegisterEvent("CHAT_MSG_WHISPER");
-EventFrame:SetScript("OnEvent", function(self,event,msg,sender)
+--EventFrame:RegisterEvent("CHAT_MSG_WHISPER");
+--EventFrame:SetScript("OnEvent", function(self,event,msg,sender)
 	--We're making sure the command is case insensitive by casting it to lowercase before running a pattern check
-    if msg:lower():find("!stats") then
-        ChatMsg("Work in Progress","WHISPER",nil,sender);
-    end
-end);
+--    if msg:lower():find("!stats") then
+--        ChatMsg("Work in Progress","WHISPER",nil,sender);
+--    end
+--end);
 
 --TODO attach a function callback to each slash command
 --		cuts out 90% of this vertical space
 function GBC_SlashCmd(msg)
+	print(msg)
 	local msg = msg:lower();
 	
 	if (msg == "" or msg == nil) then
@@ -251,35 +256,33 @@ function GBC_SlashCmd(msg)
 	WriteMsg("", "", "|cffffff00Invalid argument for command /cg");
 end
 
-SLASH_GBC1 = "/GreyCasino";
-SLASH_GBC2 = "/gbc";
-SLASH_GBC3 = "/GreybeardsCasino";
-SlashCmdList["GBC"] = GBC_SlashCmd
+--SLASH_GBC1 = "/GreyCasino";
+--SLASH_GBC2 = "/gbc";
+--SLASH_GBC3 = "/GreybeardsCasino";
+--SlashCmdList["GBC"] = GBC_SlashCmd
 
-local function OptionsFormatter(text, prefix)
-	if prefix == "" or prefix == nil then 
-		prefix = "/gbc" 
-	end
-	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
+--local function OptionsFormatter(text, prefix)
+--	if prefix == "" or prefix == nil then 
+--		prefix = "/gbc" 
+--	end
+--	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
+--end
+
+function GBC_EditBox_Stakes_OnLoad()
+    GBC_EditBox_Stakes:SetNumeric(true);
+	GBC_EditBox_Stakes:SetAutoFocus(false);
 end
 
-
-
-function GBC_EditBox_OnLoad()
-    --GBC_EditBox:SetNumeric(true);
-	--GBC_EditBox:SetAutoFocus(false);
-end
-
-function GBC_EditBox_OnEnterPressed()
-    GBC_EditBox:ClearFocus();
+function GBC_EditBox_Stakes_OnEnterPressed()
+    GBC_EditBox_Stakes:ClearFocus();
 end
 
 function GBC_CloseFrame()
-	GBC_SlashCmd("hide")
+	GBC_SlashCmd("hide") --TODO redundant
 	g_app.hidden = true
 end
 
-function GBC_OnClickCHAT()
+function GBC_Btn_ChatBroadcast_OnClick()
 	--TODO cleanup, find a clean way to loop over available chat channels
 	--TODO remove this redundant GBC["chat"]
 	if(GBC["chat"] == nil) then GBC["chat"] = 1 end
@@ -294,11 +297,12 @@ function GBC_OnClickCHAT()
 	end
 end
 
-function GBC_OnClickWHISPERS()
+function GBC_Btn_StatsDisplay_OnClick()
+	PrintStats(false)
 end
 
-function GBC_OnClickSTATS()
-	PrintStats(false)
+--TODO
+function GBC_Btn_StatsReset_OnClick()
 end
 
 function GBC_Reset()
@@ -332,7 +336,7 @@ end
 
 --TODO remove JoinStats. unnecessary bloat that nobody will ever use
 --Joins the stats for an alternate name
-function JoinStats(msg)
+local function JoinStats(msg)
 	local i = string.find(msg, " ");
 	if((not i) or i == -1 or string.find(msg, "[", 1, true) or string.find(msg, "]", 1, true)) then
 		ChatFrame1:AddMessage("");
@@ -346,7 +350,7 @@ function JoinStats(msg)
 	GBC["joinstats"][altname] = mainname;
 end
 
-function UnjoinStats(altname)
+local function UnjoinStats(altname)
 	if(altname ~= nil and altname ~= "") then
 		ChatFrame1:AddMessage(string.format("Unjoined alt '%s' from any other characters", altname));
 		GBC["joinstats"][altname] = nil;
@@ -358,7 +362,7 @@ function UnjoinStats(altname)
 	end
 end
 
-function PrintStats(showAllStats)
+local function PrintStats(showAllStats)
 	local sortlistname = {}
 	local sortlistamount = {}
 	local n = 0
@@ -429,7 +433,28 @@ function PrintStats(showAllStats)
 	end
 end
 
-function GBC_OnClickROLL()
+function GBC_Btn_RoundNext()
+	NextPhase()
+end
+
+--TODO soft code this for different rule sets
+local function NextPhase()
+	if g_round.currentPhase >= g_round.maxPhase then
+		return
+	end
+
+	if g_round.currentPhase == 0 then
+		GBC_OnClickACCEPTENTRIES()
+	elseif g_round.currentPhase == 1 then
+		GBC_OnClickLASTCALL()
+	elseif g_round.currentPhase == 2 then
+		GBC_OnClickROLL()
+	end
+
+	g_round.currentRound = g_round.currentRound + 1
+end
+
+local function GBC_OnClickROLL()
 	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
 	if g_round.totalRolls > 0 and g_round.acceptRolls then
 		if table.getn(GBC.strings) ~= 0 then
@@ -463,14 +488,14 @@ function GBC_OnClickROLL()
 	end
 end
 
-function GBC_OnClickLASTCALL()
+local function GBC_OnClickLASTCALL()
 	ChatMsg("Last Call to join!");
 	--GBC_EditBox:ClearFocus();
 	--GBC_LASTCALL_Button:Disable();
 	--GBC_ROLL_Button:Enable();
 end
 
-function GBC_OnClickACCEPTENTRIES()
+local function GBC_OnClickACCEPTENTRIES()
 	--if GBC_EditBox:GetText() ~= "" and GBC_EditBox:GetText() ~= g_app.chatEnterMsg then
 	if true then
 		GBC_Reset()
@@ -511,7 +536,8 @@ function GBC_OnClickRoll1()
 	ChatMsg(g_app.chatEnterMsg);
 end
 
-function ToggleFrame(show)
+--TODO rename, this conflicts with Blizz UI function names
+local function ToggleFrame(show)
 	g_app.hidden = not show
 	
 	--if g_app.hidden then
@@ -521,31 +547,31 @@ function ToggleFrame(show)
 	--end
 end
 
-function ToggleMinimap()
-	g_app.showMinimap = not g_app.showMinimap
+--function ToggleMinimap()
+--	g_app.showMinimap = not g_app.showMinimap
 
 	--if g_app.showMinimap then
 	--	GBC_MinimapButton:Show()
 	--else
 	--	GBC_MinimapButton:Hide()
 	--end
-end
+--end
 
 --GBC_Settings = {
 --	MinimapPos = 75
 --}
 -- ** do not call from the mod's OnLoad, VARIABLES_LOADED or later is fine. **
-function GBC_MinimapButton_Reposition()
+--function GBC_MinimapButton_Reposition()
 	--GBC_MinimapButton:SetPoint(
 	--	"TOPLEFT",
 	--	"Minimap",
 	--	"TOPLEFT",
 	--	52-(80*cos(GBC_Settings.MinimapPos)),
 	--	(80*sin(GBC_Settings.MinimapPos))-52)
-end
+--end
 
 --TODO drag function does not work
-function GBC_MinimapButton_DraggingFrame_OnUpdate()
+--function GBC_MinimapButton_DraggingFrame_OnUpdate()
 	--local xpos,ypos = GetCursorPosition()
 	--local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
 
@@ -554,12 +580,12 @@ function GBC_MinimapButton_DraggingFrame_OnUpdate()
 
 	--GBC_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
 	--GBC_MinimapButton_Reposition()
-end
+--end
 
 
-function GBC_MinimapButton_OnClick()
+--function GBC_MinimapButton_OnClick()
 	--DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
-end
+--end
 
 local function ConvertRollToGold(value)
 	local tempValue = tonumber(value)
