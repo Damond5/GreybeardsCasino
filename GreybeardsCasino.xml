@@ -280,9 +280,6 @@
 				self:UnlockHighlight()
 				GBC_MinimapButton_DraggingFrame:Hide()
 			</OnDragStop>
-			<OnClick>
-				ToggleFrame(GBC_Frame)
-			</OnClick>
 		</Scripts>
 	</Button>
 		</Frames>

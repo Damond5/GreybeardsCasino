@@ -96,12 +96,12 @@ function GBC_SlashCmd(msg)
 	end
 	
 	if (msg == "hide") then
-		ToggleFrame(false)
+		GBC_ToggleFrame(false)
 		return
 	end
 	
 	if (msg == "show") then
-		ToggleFrame(true)
+		GBC_ToggleFrame(true)
 		return
 	end
 	
@@ -123,7 +123,7 @@ function GBC_SlashCmd(msg)
 	end
 	
 	if (msg == "minimap") then
-		ToggleMinimap()
+		GBC_ToggleMinimap()
 		return
 	end
 	
@@ -501,7 +501,7 @@ function GBC_OnClickRoll1()
 	ChatMsg(g_app.chatEnterMsg);
 end
 
-function ToggleFrame(show)
+function GBC_ToggleFrame(show)
 	g_app.hidden = not show
 	
 	if g_app.hidden then
@@ -511,7 +511,7 @@ function ToggleFrame(show)
 	end
 end
 
-function ToggleMinimap()
+function GBC_ToggleMinimap()
 	g_app.showMinimap = not g_app.showMinimap
 
 	if g_app.showMinimap then
