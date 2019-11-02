@@ -73,12 +73,15 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
 						<Frames>
-							<Button name="GBC_Btn_ChatBroadcast" inherits="OptionsButtonTemplate" text="Broadcast to: Raid">
+							<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
 								<Anchors>
 									<Anchor relativeTo="GBC_Admin" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 									<Anchor relativeTo="GBC_Admin" relativePoint="TOPLEFT" point="TOPLEFT"/>
 								</Anchors>
 								<Scripts>
+									<OnLoad>
+										UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
+									</OnLoad>
 									<OnClick>
 										GBC_Btn_ChatBroadcast_OnClick()
 									</OnClick>
@@ -118,11 +121,30 @@
 					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 				</Anchors>
 				<Frames>
-					<Frame name="GBC_RoundControls">
+					<Frame name="GBC_Status">
 						<Size x="225"/>
 						<Anchors>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+						</Anchors>
+						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
+						<Frames>
+							<ScrollFrame>
+								<Anchors>
+									<Anchor relativeTo="GBC_Status" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="TOPLEFT" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMLEFT" point="BOTTOLEFT"/>
+								</Anchors>
+							</ScrollFrame>
+						</Frames>
+					</Frame>
+					<Frame name="GBC_RoundControls">
+						<Anchors>
+							<Anchor relativeTo="GBC_Status" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+							<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
 						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
 						<Frames>
@@ -143,7 +165,7 @@
 										GBC_EditBox_Stakes_OnEnterPressed()
 									</OnEnterPressed>
 									<OnEscapePressed>
-										self:ClearFocus()
+										GBC_EditBox_Stakes_OnEnterPressed()
 									</OnEscapePressed>
 								</Scripts>
 								<Size y="26"/>
@@ -167,26 +189,23 @@
 									<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 									<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_RoundNext_OnClick()
+									</OnClick>
+								</Scripts>
 							</Button>
-						</Frames>
-					</Frame>
-					<Frame name="GBC_Status">
-						<Anchors>
-							<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-							<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-						</Anchors>
-						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border"/>
-						<Frames>
-							<ScrollFrame>
+							<Button name="GBC_Btn_RoundReset" inherits="OptionsButtonTemplate" text="Reset">
 								<Anchors>
-									<Anchor relativeTo="GBC_Status" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Status" relativePoint="TOPLEFT" point="TOPLEFT"/>
-									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
-									<Anchor relativeTo="GBC_Status" relativePoint="BOTTOMLEFT" point="BOTTOLEFT"/>
+									<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+									<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 								</Anchors>
-							</ScrollFrame>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_RoundReset_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button>
 						</Frames>
 					</Frame>
 				</Frames>

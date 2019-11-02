@@ -1,26 +1,26 @@
 --Greybeards Casino
 --Author: Looch
 
-g_app = {
+local g_app = {
 	hidden = true,
 	customChannel = "GreybeardsCasino",
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
 	chatMethods = {
+		"SAY",
 		"RAID",
 		"PARTY",
 		"GUILD",
 		"CHANNEL",
-		"SAY"
 	},
-	currentChatMethod = "CHANNEL",
-	lastRoll = 100,
+	currentChatMethod = "SAY",
+	savedStakes = 100,
 	showMinimap = false,
 	acceptedEntriesFrame = nil,
 	debug = true
 }
 
-g_roundDefaults = {
+local g_roundDefaults = {
 	currentPhase = 0,
 	maxPhases = 3,
 	acceptEntries = false,
@@ -40,285 +40,101 @@ g_roundDefaults = {
 	tielow = 0, --TODO redundant. just use currentLow
 }
 
-g_round = g_roundDefaults
+local g_round = g_roundDefaults
+
 --g_rollCmd = SLASH_RANDOM1:upper()
 
--- LOAD FUNCTION --
-function GBC_OnLoad(self)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
-
-	--self:RegisterEvent("CHAT_MSG_RAID");
-	--self:RegisterEvent("CHAT_MSG_CHANNEL");
-	--self:RegisterEvent("CHAT_MSG_RAID_LEADER");
-	--self:RegisterEvent("CHAT_MSG_PARTY_LEADER");
-	--self:RegisterEvent("CHAT_MSG_PARTY");
-	--self:RegisterEvent("CHAT_MSG_GUILD");
-	--self:RegisterEvent("CHAT_MSG_SAY");
-	--self:RegisterEvent("CHAT_MSG_SYSTEM");
-	--self:RegisterEvent("PLAYER_ENTERING_WORLD");
+local function ConvertRollToGold(value)
+	local tempValue = tonumber(value)
+	silver = tempValue % 100
+	tempValue = math.floor(tempValue / 100)
+	tempValue = string.format("%sg", tempValue)
 	
-	--TODO broken
-	--self:RegisterForDrag("LeftButton");
-    
-	--GBC_ResetUI();
+	if silver > 0 then
+		tempValue = string.format("%s %ds", tempValue, silver)
+	end
+	
+	return tempValue
 end
 
-function GBC_OnEvent(self, event, ...)
-	print(event)
-	if event == "PLAYER_ENTERING_WORLD" then
-		--TODO remove
-		if(not GBC) then
-			GBC = {
-				["chat"] = 1,
-				["strings"] = { },
-				["lowtie"] = { }, --TODO remove
-				["hightie"] = { }, --TODO remove
-				["bans"] = { },
-			}
-		--TODO cleanup crossgambling relic
-		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
-		--elseif tostring(type(GBC["chat"])) ~= "number" then
-		--	GBC["chat"] = 1
-		end
+local function ResetRound()
+	g_round = g_roundDefaults
 
-		if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
-		if(not GBC["joinstats"]) then 		GBC["joinstats"] 	= { }; end
-		if(not GBC["chat"]) then 			GBC["chat"] 		= 1; end
-		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
-	
-		--TODO UI initialization
-		--GBC_EditBox:SetJustifyH("CENTER");
-		--GBC_EditBox:SetText(g_app.lastRoll);
-
-		--SetChatTarget
-		g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
-
-		--MiniMap
-		--if g_app.showMinimap then
-		--	GBC_MinimapButton:Show()
-		--else
-		--	GBC_MinimapButton:Hide()
-		--end
-
-		--TODO move to ?? idk
-		--if(GBC["active"] == 1) then
-		--	GBC_Frame:Show();
-		--else
-		--	GBC_Frame:Hide();
-		--end
-	end
-
-	-- CHAT PARSING 
-	--TODO move AcceptOnes logic to parse chat. Or jut remove this global
-	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and GBC["chat"] == 1) then
-		local msg, _,_,_,name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-	if ((event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_PARTY")and g_round.acceptEntries and GBC["chat"] == 2) then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-    if ((event == "CHAT_MSG_GUILD_LEADER" or event == "CHAT_MSG_GUILD")and g_round.acceptEntries and GBC["chat"] == 3) then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-	
-	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and GBC["chat"] == 4 then
-		local msg,_,_,_,name,_,_,_,channel = ...
-		if channel == g_app.customChannel then
-			ParseChatMsg(msg, name)
-		end
-	end
-
-	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and GBC["chat"] == 5 then
-		local msg, name = ... -- name no realm
-		ParseChatMsg(msg, name)
-	end
-
-	if event == "CHAT_MSG_SYSTEM" and g_round.acceptRolls then
-		local msg = ...
-		ParseRoll(msg);
-	end
-end
-
-
---TODO cleanup slop
---local EventFrame=CreateFrame("Frame");
--- Need to register an event to receive it
---EventFrame:RegisterEvent("CHAT_MSG_WHISPER");
---EventFrame:SetScript("OnEvent", function(self,event,msg,sender)
-	--We're making sure the command is case insensitive by casting it to lowercase before running a pattern check
---    if msg:lower():find("!stats") then
---        ChatMsg("Work in Progress","WHISPER",nil,sender);
---    end
---end);
-
---TODO attach a function callback to each slash command
---		cuts out 90% of this vertical space
-function GBC_SlashCmd(msg)
-	print(msg)
-	local msg = msg:lower();
-	
-	if (msg == "" or msg == nil) then
-	    WriteMsg("", "", "~Following commands for GreybeardsCasino~");
-		WriteMsg("", "", "show - Shows the frame");
-		WriteMsg("", "", "hide - Hides the frame");
-		WriteMsg("", "", "channel - Change the custom channel for gambling");
-		WriteMsg("", "", "reset - Resets the AddOn");
-		WriteMsg("", "", "fullstats - list full stats");
-		WriteMsg("", "", "resetstats - Resets the stats");
-		WriteMsg("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]");
-		WriteMsg("", "", "minimap - Toggle minimap show/hide");
-		WriteMsg("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to");
-		WriteMsg("", "", "ban - Ban's the user from being able to roll")
-		WriteMsg("", "", "unban - Unban's the user")
-		WriteMsg("", "", "listban - Shows ban list")
-		WriteMsg("", "", "debug {enable|disable}")
-		return
-	end
-	
-	if (msg == "hide") then
-		ToggleFrame(false)
-		return
-	end
-	
-	if (msg == "show") then
-		ToggleFrame(true)
-		return
-	end
-	
-	if (msg == "reset") then
-		GBC_Reset()
-		GBC_ResetCmd()
-		return
-	end
-	
-	if (msg == "fullstats") then
-		PrintStats(true)
-		return
-	end
-	
-	if (msg == "resetstats") then
-		WriteMsg("", "", "|cffffff00GCG stats have now been reset")
-		ResetStats()
-		return
-	end
-	
-	if (msg == "minimap") then
-		ToggleMinimap()
-		return
-	end
-	
-	if (string.sub(msg, 1, 7) == "channel") then
-		ChangeChannel(strsub(msg, 9));
-		return
-	end
-	
-	if (string.sub(msg, 1, 9) == "joinstats") then
-		JoinStats(strsub(msg, 11));
-		return
-	end
-	
-	if (string.sub(msg, 1, 11) == "unjoinstats") then
-		UnjoinStats(strsub(msg, 13));
-		return
-	end
-
-	if (string.sub(msg, 1, 3) == "ban") then
-		AddBannedPlayer(strsub(msg, 5));
-		return
-	end
-
-	if (string.sub(msg, 1, 5) == "unban") then
-		RemoveBannedPlayer(strsub(msg, 7));
-		return
-	end
-
-	if (string.sub(msg, 1, 7) == "listban") then
-		ListBannedPlayers();
-		return
-	end
-
-	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,13) == "enable") then
-		DebugMode(true)
-		return
-	end
-
-	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,14) == "disable") then
-		DebugMode(false)
-		return
-	end
-
-	--Fallthrough
-	WriteMsg("", "", "|cffffff00Invalid argument for command /cg");
-end
-
---SLASH_GBC1 = "/GreyCasino";
---SLASH_GBC2 = "/gbc";
---SLASH_GBC3 = "/GreybeardsCasino";
---SlashCmdList["GBC"] = GBC_SlashCmd
-
---local function OptionsFormatter(text, prefix)
---	if prefix == "" or prefix == nil then 
---		prefix = "/gbc" 
---	end
---	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
---end
-
-function GBC_EditBox_Stakes_OnLoad()
-    GBC_EditBox_Stakes:SetNumeric(true);
-	GBC_EditBox_Stakes:SetAutoFocus(false);
-end
-
-function GBC_EditBox_Stakes_OnEnterPressed()
-    GBC_EditBox_Stakes:ClearFocus();
-end
-
-function GBC_CloseFrame()
-	GBC_SlashCmd("hide") --TODO redundant
-	g_app.hidden = true
-end
-
-function GBC_Btn_ChatBroadcast_OnClick()
-	--TODO cleanup, find a clean way to loop over available chat channels
-	--TODO remove this redundant GBC["chat"]
-	if(GBC["chat"] == nil) then GBC["chat"] = 1 end
-
-	GBC["chat"] = (GBC["chat"] % #g_app.chatMethods) + 1
-	g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-	
-	--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
-
-	if g_app.currentChatMethod == "CHANNEL" then
-		WriteMsg("","",string.format("Custom channel set to: %s", g_app.customChannel))
-	end
-end
-
-function GBC_Btn_StatsDisplay_OnClick()
-	PrintStats(false)
-end
-
---TODO
-function GBC_Btn_StatsReset_OnClick()
-end
-
-function GBC_Reset()
 	GBC["strings"] = { }; --TODO ???
 	GBC["lowtie"] = { }; --TODO remove
 	GBC["hightie"] = { }; --TODO remove
 	
-	g_round = g_roundDefaults
-	
-	GBC_ResetUI()
-	
-	--GBC_AcceptEntries_Button:SetText("Open Entry");
+	ResetGBCFrames()
+
+	print("round reset")
 	WriteMsg("", "", "|cffffff00GCG has now been reset");
 end
 
-function GBC_ResetUI()
+local function StartRound()
+	ResetRound()
+	
+	g_app.savedStakes = GBC_EditBox_Stakes:GetText()
+	g_round.acceptEntries = true
+	g_round.currentStakes = tonumber(g_app.savedStakes) 
+	g_round.currentLowRoll = g_round.currentStakes + 1
+	g_round.tielow = g_round.currentStakes + 1
+
+	
+	ChatMsg(format(".:The Greybeards Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
+	ChatMsg(".:Hi/Lo:. Lowest roller pays Highest roller the difference between rolls:.")
+	ChatMsg(format(".:Players will  /roll %s  .:. Type %s to Join  .:. Type %s to withdraw:.", 
+					g_round.currentStakes, 
+					g_app.chatEnterMsg, 
+					g_app.chatWithdrawMsg))
+
+	GBC_Btn_RoundNext:SetText("Announce Last Call")
+end
+
+local function AnnounceLastCall()
+	ChatMsg("Last Call to join!");
+	GBC_Btn_RoundNext:SetText("Begin Rolling")
+end
+
+local function AnnounceRolling()
+	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
+	--if g_round.totalRolls > 0 and g_round.acceptRolls then
+	--	if table.getn(GBC.strings) ~= 0 then
+	--		ListRemainingPlayers()
+	--	end
+	--	return
+	--end
+
+	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
+		g_round.acceptEntries = false 
+		g_round.acceptRolls = true 
+		if (g_round.currentTie == 0) then 
+			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", g_round.currentStakes))
+		end
+
+		if (g_round.currentLowBreak == 1) then
+			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
+			ListRemainingPlayers()
+		end
+
+		if (g_round.currentHighBreak == 1) then
+			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
+			ListRemainingPlayers();
+		end
+
+		--GBC_EditBox:ClearFocus();
+	end
+
+	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
+		ChatMsg("Not enough Players!");
+	end
+end
+
+
+function ResetGBCFrames()
+	GBC_EditBox_Stakes:SetText(g_app.savedStakes)
+	GBC_Btn_RoundNext:SetText("Start Round")
+
+
 	--GBC_ROLL_Button:Disable();
 	--GBC_AcceptEntries_Button:Enable();
 	--GBC_LASTCALL_Button:Disable();
@@ -330,9 +146,62 @@ function GBC_ResetUI()
 	--end
 end
 
-function GBC_ResetCmd()
-	ChatMsg(".:GBC:. Game has been reset", chatmethod)
+--TODO soft code this for different rule sets
+local function NextPhase()
+	if g_round.currentPhase == 0 then
+		StartRound()
+	elseif g_round.currentPhase == 1 then
+		AnnounceLastCall()
+	elseif g_round.currentPhase == 2 then
+		AnnounceRolling()
+	end
+
+	g_round.currentPhase = g_round.currentPhase + 1
 end
+
+--local function GBC_OnClickROLL()
+--	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
+--	if g_round.totalRolls > 0 and g_round.acceptRolls then
+--		if table.getn(GBC.strings) ~= 0 then
+--			ListRemainingPlayers()
+--		end
+--		return
+--	end
+
+--	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
+---		g_round.acceptEntries = false 
+--		g_round.acceptRolls = true 
+--		if (g_round.currentTie == 0) then 
+--			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", currentStakes))
+--		end
+--
+--		if (g_round.currentLowBreak == 1) then
+--			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
+--			ListRemainingPlayers()
+--		end
+--
+--		if (g_round.currentHighBreak == 1) then
+--			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
+--			ListRemainingPlayers();
+--		end
+--
+		--GBC_EditBox:ClearFocus();
+--	end
+
+--	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
+--		ChatMsg("Not enough Players!");
+--	end
+--end
+
+
+--function GBC_OnClickRoll()
+	--hash_SlashCmdList[g_rollCmd](g_round.currentStakes)
+	--hash_SlashCmdList[g_rollCmd](GBC_EditBox:GetText())
+--end
+
+--function GBC_OnClickRoll1()
+--	ChatMsg(g_app.chatEnterMsg);
+--end
 
 --TODO remove JoinStats. unnecessary bloat that nobody will ever use
 --Joins the stats for an alternate name
@@ -433,109 +302,6 @@ local function PrintStats(showAllStats)
 	end
 end
 
-function GBC_Btn_RoundNext()
-	NextPhase()
-end
-
---TODO soft code this for different rule sets
-local function NextPhase()
-	if g_round.currentPhase >= g_round.maxPhase then
-		return
-	end
-
-	if g_round.currentPhase == 0 then
-		GBC_OnClickACCEPTENTRIES()
-	elseif g_round.currentPhase == 1 then
-		GBC_OnClickLASTCALL()
-	elseif g_round.currentPhase == 2 then
-		GBC_OnClickROLL()
-	end
-
-	g_round.currentRound = g_round.currentRound + 1
-end
-
-local function GBC_OnClickROLL()
-	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
-	if g_round.totalRolls > 0 and g_round.acceptRolls then
-		if table.getn(GBC.strings) ~= 0 then
-			ListRemainingPlayers()
-		end
-		return
-	end
-
-	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
-		g_round.acceptEntries = false 
-		g_round.acceptRolls = true 
-		if (g_round.currentTie == 0) then 
-			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", currentStakes))
-		end
-
-		if (g_round.currentLowBreak == 1) then
-			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
-			ListRemainingPlayers()
-		end
-
-		if (g_round.currentHighBreak == 1) then
-			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
-			ListRemainingPlayers();
-		end
-
-		--GBC_EditBox:ClearFocus();
-	end
-
-	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
-		ChatMsg("Not enough Players!");
-	end
-end
-
-local function GBC_OnClickLASTCALL()
-	ChatMsg("Last Call to join!");
-	--GBC_EditBox:ClearFocus();
-	--GBC_LASTCALL_Button:Disable();
-	--GBC_ROLL_Button:Enable();
-end
-
-local function GBC_OnClickACCEPTENTRIES()
-	--if GBC_EditBox:GetText() ~= "" and GBC_EditBox:GetText() ~= g_app.chatEnterMsg then
-	if true then
-		GBC_Reset()
-		
-		--GBC_ROLL_Button:Disable()
-		--GBC_LASTCALL_Button:Disable()
-		--GBC_AcceptEntries_Button:SetText("New Game")
-		--GBC_EditBox:ClearFocus()
-		--g_app.lastRoll = GBC_EditBox:GetText()
-		
-		--TODO temp until we have a text box
-		local stake = 100
-		g_app.lastRoll = stake
-		g_round.acceptEntries = true
-		g_round.currentStakes = stake --tonumber(GBC_EditBox:GetText())
-		g_round.currentLowRoll = g_round.currentStakes + 1
-		g_round.tielow = g_round.currentStakes + 1
-		
-		ChatMsg(format(".:The Greybeards Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
-		ChatMsg(".:Hi/Lo - Lowest roller pays Highest roller the difference between rolls:.")
-		ChatMsg(format(".:Players will  /roll %s  // Type %s to Join  // Type %s to withdraw:.", 
-						--GBC_EditBox:GetText(), 
-						stake,
-						g_app.chatEnterMsg, 
-						g_app.chatWithdrawMsg))
-	--else
-		--TODO remove, this does nothing
-		--message("Please enter a number to roll from.", chatmethod)
-	end
-end
-
-function GBC_OnClickRoll()
-	hash_SlashCmdList[g_rollCmd](g_round.currentStakes)
-	--hash_SlashCmdList[g_rollCmd](GBC_EditBox:GetText())
-end
-
-function GBC_OnClickRoll1()
-	ChatMsg(g_app.chatEnterMsg);
-end
-
 --TODO rename, this conflicts with Blizz UI function names
 local function ToggleFrame(show)
 	g_app.hidden = not show
@@ -587,19 +353,6 @@ end
 	--DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
 --end
 
-local function ConvertRollToGold(value)
-	local tempValue = tonumber(value)
-	silver = tempValue % 100
-	tempValue = math.floor(tempValue / 100)
-	tempValue = string.format("%sg", tempValue)
-	
-	if silver > 0 then
-		tempValue = string.format("%s %ds", tempValue, silver)
-	end
-	
-	return tempValue
-end
-
 function ChangeChannel(channel)
 	g_app.customChannel = channel
 end
@@ -622,16 +375,17 @@ function ReportResults()
 			msg = format("%s - %s", msg, "Alternatively, Louch has good mage water available to trade.")
 		end
 		
-		GBC["stats"][g_round.highName] = (GBC["stats"][g_round.highName] or 0) + goldowed;
-		GBC["stats"][g_round.lowName] = (GBC["stats"][g_round.lowName] or 0) - goldowed;
+		GBC["stats"][g_round.highName] = (GBC["stats"][g_round.highName] or 0) + goldowed
+		GBC["stats"][g_round.lowName] = (GBC["stats"][g_round.lowName] or 0) - goldowed
 
-		ChatMsg(msg);
+		ChatMsg(msg)
 	else
-		ChatMsg("It was a tie! No payouts on this roll!");
+		ChatMsg("It was a tie! No payouts on this roll!")
 	end
 	
 	--Reset Game
-	GBC_Reset();
+	ResetRound()
+	ResetGBCFrames()
 	--GBC_AcceptEntries_Button:SetText("Open Entry");
 	--GBC_CHAT_Button:Enable();
 end
@@ -989,7 +743,7 @@ function WriteMsg(pre, red, text)
 end
 
 function ChatMsg(msg, chatType, language, channel)
-	chatType = chatType or g_app.currentChatMethod
+	chatType = g_app.currentChatMethod
 	channelnum = GetChannelName(channel or g_app.customChannel)
 	SendChatMessage(msg, chatType, language, channelnum)
 end
@@ -1007,4 +761,326 @@ function DebugWrite(msg)
 	if g_app.debug then
 		WriteMsg("","","[DEBUG]"..msg)
 	end
+end
+
+
+-- LOAD FUNCTION --
+function GBC_OnLoad(self)
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
+
+	self:RegisterEvent("CHAT_MSG_RAID")
+	self:RegisterEvent("CHAT_MSG_CHANNEL")
+	self:RegisterEvent("CHAT_MSG_RAID_LEADER")
+	self:RegisterEvent("CHAT_MSG_PARTY_LEADER")
+	self:RegisterEvent("CHAT_MSG_PARTY")
+	self:RegisterEvent("CHAT_MSG_GUILD")
+	self:RegisterEvent("CHAT_MSG_SAY")
+	self:RegisterEvent("CHAT_MSG_SYSTEM")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	
+	--TODO broken
+	--self:RegisterForDrag("LeftButton");
+    
+	ResetGBCFrames()
+end
+
+function GBC_OnEvent(self, event, ...)
+	if event == "PLAYER_ENTERING_WORLD" then
+		--TODO remove
+		if(not GBC) then
+			GBC = {
+				--["chat"] = 1,
+				["strings"] = { },
+				["lowtie"] = { }, --TODO remove
+				["hightie"] = { }, --TODO remove
+				["bans"] = { },
+			}
+		--TODO cleanup crossgambling relic
+		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
+		--elseif tostring(type(GBC["chat"])) ~= "number" then
+		--	GBC["chat"] = 1
+		end
+
+		if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
+		if(not GBC["joinstats"]) then 		GBC["joinstats"] 	= { }; end
+		--if(not GBC["chat"]) then 			GBC["chat"] 		= 1; end
+		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
+	
+		--TODO UI initialization
+		--GBC_EditBox:SetJustifyH("CENTER");
+		--GBC_EditBox:SetText(g_app.lastRoll);
+
+		--SetChatTarget
+		--g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
+		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
+
+		--MiniMap
+		--if g_app.showMinimap then
+		--	GBC_MinimapButton:Show()
+		--else
+		--	GBC_MinimapButton:Hide()
+		--end
+
+		--TODO move to ?? idk
+		--if(GBC["active"] == 1) then
+		--	GBC_Frame:Show();
+		--else
+		--	GBC_Frame:Hide();
+		--end
+	end
+
+	-- CHAT PARSING 
+	--TODO move AcceptOnes logic to parse chat. Or jut remove this global
+	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and g_app.currentChatMethod == "RAID") then
+		local msg, _,_,_,name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+	if ((event == "CHAT_MSG_PARTY_LEADER" or event == "CHAT_MSG_PARTY")and g_round.acceptEntries and g_app.currentChatMethod == "PARTY") then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+    if ((event == "CHAT_MSG_GUILD_LEADER" or event == "CHAT_MSG_GUILD")and g_round.acceptEntries and g_app.currentChatMethod == "GUILD") then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+	
+	if event == "CHAT_MSG_CHANNEL" and g_round.acceptEntries and g_app.currentChatMethod == "CHANNEL" then
+		local msg,_,_,_,name,_,_,_,channel = ...
+		if channel == g_app.customChannel then
+			ParseChatMsg(msg, name)
+		end
+	end
+
+	if event == "CHAT_MSG_SAY" and g_round.acceptEntries and g_app.currentChatMethod == "SAY" then
+		local msg, name = ... -- name no realm
+		ParseChatMsg(msg, name)
+	end
+
+	if event == "CHAT_MSG_SYSTEM" and g_round.acceptRolls then
+		local msg = ...
+		ParseRoll(msg);
+	end
+end
+
+--TODO cleanup slop
+--local EventFrame=CreateFrame("Frame");
+-- Need to register an event to receive it
+--EventFrame:RegisterEvent("CHAT_MSG_WHISPER");
+--EventFrame:SetScript("OnEvent", function(self,event,msg,sender)
+	--We're making sure the command is case insensitive by casting it to lowercase before running a pattern check
+--    if msg:lower():find("!stats") then
+--        ChatMsg("Work in Progress","WHISPER",nil,sender);
+--    end
+--end);
+
+--local function OptionsFormatter(text, prefix)
+--	if prefix == "" or prefix == nil then 
+--		prefix = "/gbc" 
+--	end
+--	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
+--end
+
+function GBC_EditBox_Stakes_OnLoad()
+    GBC_EditBox_Stakes:SetNumeric(true);
+	GBC_EditBox_Stakes:SetAutoFocus(false);
+end
+
+function GBC_EditBox_Stakes_OnEnterPressed()
+    GBC_EditBox_Stakes:ClearFocus();
+end
+
+function GBC_CloseFrame()
+	ToggleFrame(false)
+end
+
+local function CreateChatMethodText(chatMethod)
+	return format("Broadcast to %s", chatMethod)
+end
+
+function SetChatMethod(self)
+	local chatMethod = self.value
+	g_app.currentChatMethod = chatMethod
+	UIDropDownMenu_SetSelectedValue(GBC_Btn_ChatBroadcast, self, true)
+	UIDropDownMenu_SetText(GBC_Btn_ChatBroadcast, CreateChatMethodText(chatMethod))
+end
+
+function GBC_Btn_ChatBroadcast_OnLoad()
+	for idx=1, #g_app.chatMethods, 1 do
+		option = {
+			text = CreateChatMethodText(g_app.chatMethods[idx]),
+			value = g_app.chatMethods[idx], 
+			func = SetChatMethod
+		}
+
+		UIDropDownMenu_AddButton(option)
+
+		if UIDropDownMenu_GetText(GBC_Btn_ChatBroadcast) == nil then
+			UIDropDownMenu_SetSelectedValue(GBC_Btn_ChatBroadcast, option, true)
+			UIDropDownMenu_SetText(GBC_Btn_ChatBroadcast, CreateChatMethodText(g_app.chatMethods[idx]))
+		end 
+	end 
+end
+
+--TODO remove
+--function GBC_Btn_ChatBroadcast_OnClick()
+	--TODO cleanup, find a clean way to loop over available chat channels
+	--TODO remove this redundant GBC["chat"]
+--	if(GBC["chat"] == nil) then 
+--		GBC["chat"] = 1 
+--	end
+
+--	GBC["chat"] = (GBC["chat"] % #g_app.chatMethods) + 1
+--	g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
+
+--	GBC_Btn_ChatBroadcast:SetText(format("Broadcast to: %s", g_app.currentChatMethod))
+	
+	--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
+	--print(g_app.currentChatMethod)
+--	WriteMsg("","",string.format("Channel set to: %s", g_app.currentChatMethod))
+	--if g_app.currentChatMethod == "CHANNEL" then
+	--	WriteMsg("","",string.format("Custom channel set to: %s", g_app.customChannel))
+	--end
+--end
+
+function GBC_Btn_StatsDisplay_OnClick()
+	PrintStats(false)
+end
+
+--TODO
+function GBC_Btn_StatsReset_OnClick()
+
+end
+
+--function GBC_Reset()
+--	GBC["strings"] = { }; --TODO ???
+--	GBC["lowtie"] = { }; --TODO remove
+--	GBC["hightie"] = { }; --TODO remove
+	
+--	g_round = g_roundDefaults
+	
+	--GBC_ResetUI()
+	
+	--GBC_AcceptEntries_Button:SetText("Open Entry");
+--	WriteMsg("", "", "|cffffff00GCG has now been reset");
+--end
+
+--function GBC_ResetCmd()
+--	ChatMsg(".:GBC:. Game has been reset", chatmethod)
+--end
+
+function GBC_Btn_RoundNext_OnClick()
+	NextPhase()
+end
+
+function GBC_Btn_RoundReset_OnClick()
+	ResetRound()
+end
+
+
+-- SLASH COMMANDS 
+SLASH_GBC1 = "/GreyCasino";
+SLASH_GBC2 = "/gbc";
+SLASH_GBC3 = "/GreybeardsCasino";
+SlashCmdList["GBC"] = SlashCmd
+
+--TODO attach a function callback to each slash command
+--		cuts out 90% of this vertical space
+local function SlashCmd(msg)
+	print(msg)
+	local msg = msg:lower();
+	
+	if (msg == "" or msg == nil) then
+	    WriteMsg("", "", "~Following commands for GreybeardsCasino~");
+		WriteMsg("", "", "show - Shows the frame");
+		WriteMsg("", "", "hide - Hides the frame");
+		WriteMsg("", "", "channel - Change the custom channel for gambling");
+		WriteMsg("", "", "reset - Resets the AddOn");
+		WriteMsg("", "", "fullstats - list full stats");
+		WriteMsg("", "", "resetstats - Resets the stats");
+		WriteMsg("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]");
+		WriteMsg("", "", "minimap - Toggle minimap show/hide");
+		WriteMsg("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to");
+		WriteMsg("", "", "ban - Ban's the user from being able to roll")
+		WriteMsg("", "", "unban - Unban's the user")
+		WriteMsg("", "", "listban - Shows ban list")
+		WriteMsg("", "", "debug {enable|disable}")
+		return
+	end
+	
+	if (msg == "hide") then
+		ToggleFrame(false)
+		return
+	end
+	
+	if (msg == "show") then
+		ToggleFrame(true)
+		return
+	end
+	
+	if (msg == "reset") then
+		GBC_Reset()
+		--GBC_ResetCmd()
+		return
+	end
+	
+	if (msg == "fullstats") then
+		PrintStats(true)
+		return
+	end
+	
+	if (msg == "resetstats") then
+		WriteMsg("", "", "|cffffff00GCG stats have now been reset")
+		ResetStats()
+		return
+	end
+	
+	if (msg == "minimap") then
+		ToggleMinimap()
+		return
+	end
+	
+	if (string.sub(msg, 1, 7) == "channel") then
+		ChangeChannel(strsub(msg, 9));
+		return
+	end
+	
+	if (string.sub(msg, 1, 9) == "joinstats") then
+		JoinStats(strsub(msg, 11));
+		return
+	end
+	
+	if (string.sub(msg, 1, 11) == "unjoinstats") then
+		UnjoinStats(strsub(msg, 13));
+		return
+	end
+
+	if (string.sub(msg, 1, 3) == "ban") then
+		AddBannedPlayer(strsub(msg, 5));
+		return
+	end
+
+	if (string.sub(msg, 1, 5) == "unban") then
+		RemoveBannedPlayer(strsub(msg, 7));
+		return
+	end
+
+	if (string.sub(msg, 1, 7) == "listban") then
+		ListBannedPlayers();
+		return
+	end
+
+	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,13) == "enable") then
+		DebugMode(true)
+		return
+	end
+
+	if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,14) == "disable") then
+		DebugMode(false)
+		return
+	end
+
+	--Fallthrough
+	WriteMsg("", "", "|cffffff00Invalid argument for command /cg");
 end
