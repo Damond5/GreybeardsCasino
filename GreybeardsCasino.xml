@@ -11,9 +11,6 @@
 	</Button> <!-- GBC_StatusEntry_Template -->
 
 	<Font name="GBCFont" inherits="GameFontNormal" virtual="true">
-	    <FontHeight>
-	      <AbsValue val="30"/>
-	    </FontHeight>
   	</Font> <!--GBCFont-->
 
 	<Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true">
@@ -31,7 +28,7 @@
   				self:StopMovingOrSizing()
   			</OnDragStop>
 		</Scripts>
-		<Size x="450" y="600"/>
+		<Size x="450" y="500"/>
 		<Absposition x="100" y="100"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
@@ -64,6 +61,7 @@
 				<Layers>
 					<Layer level="OVERLAY">
 						<FontString inherits="GBCFont" text="Greybeards Casino">
+							<FontHeight val="60"/>
 							<Anchors>
 								<Anchor relativeTo="GBC_Header" relativePoint="CENTER" point="CENTER"/>
 							</Anchors>
@@ -211,10 +209,26 @@
 									</Anchor>
 								</Anchors>
 								<Frames>
+									<Frame name="GBC_Contols_Banner">
+										<Size y="40"/>
+										<Anchors>
+											<Anchor relativeTo="GBC_RoundControls_Container" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_RoundControls_Container" point="TOPLEFT"/>
+										</Anchors>
+										<Layers>
+											<Layer level="OVERLAY">
+												<FontString inherits="GBCFont" text="THE CONTROLS">
+													<Anchors>
+														<Anchor relativeTo="GBC_Contols_Banner" relativePoint="CENTER" point="CENTER"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+									</Frame><!--GBC_Contols_Banner-->
 									<Frame name="GBC_Label_Stakes">
 										<Size x="70" y="30"/>
 										<Anchors>
-											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="TOPLEFT" point="TOPLEFT"/>
+											<Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 										</Anchors>
 										<Layers>
 											<Layer level="OVERLAY">
@@ -242,7 +256,7 @@
 										<FontString inherits="ChatFontNormal" justifyH="CENTER"/>
 										<Anchors>
 											<Anchor relativeTo="GBC_Label_Stakes" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 										</Anchors>
 										<Layers>
 											<Layer level="BACKGROUND">
@@ -263,10 +277,14 @@
 										</Layers>
 									</EditBox> <!-- GBC_EditBox_Stakes -->
 									<Button name="GBC_Btn_RoundNext" inherits="OptionsButtonTemplate" text="Start Round">
-										<Size y="50"/>
+										<Size y="70"/>
 										<Anchors>
-											<Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+												<Offset y="-8"/>
+											</Anchor>
+											<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+												<Offset y="-8"/>
+											</Anchor>
 										</Anchors>
 										<Scripts>
 											<OnClick>
@@ -274,6 +292,18 @@
 											</OnClick>
 										</Scripts>
 									</Button> <!-- GBC_Btn_RoundNext -->
+									<Button name="GBC_Btn_ListRemaining" inherits="OptionsButtonTemplate" text="List Remaining">
+										<Size y="26"/>
+										<Anchors>
+											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												GBC_Btn_ListRemaining_OnClick()
+											</OnClick>
+										</Scripts>
+									</Button> <!-- GBC_Btn_ListRemaining -->
 									<Frame name="GBC_Frame_Phases">
 										<Anchors>
 											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
@@ -450,7 +480,7 @@
 		</Anchors>
 		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 		<Layers>
-			<Layer level="BACKGROUND">
+			<Layer level="OVERLAY">
 				<Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\GreybeardsCasino\media\icon">
 					<Size x="22" y="22"/>
 					<Anchors>
@@ -459,8 +489,6 @@
 						</Anchor>
 					</Anchors>
 				</Texture>
-			</Layer>
-			<Layer level="OVERLAY">
 				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
 					<Size x="56" y="56"/>
 					<Anchors>

@@ -19,33 +19,32 @@ local g_app = {
 	acceptedEntriesFrame = nil,
 	debug = true,
 	sessionStats = {},
-	minimapPosition = 75
+	minimapPosition = 75,
+	rulesName = "Hi/Lo",
+	version = "1.1.0", --TODO pull this from .toc
+	banList = {}
 }
 
 local g_roundDefaults = {
 	currentPhase = 0,
 	maxPhases = 3,
 	entrants = {},
+	entrantsCount = 0,
 	acceptEntries = false,
 	acceptRolls = false,
 	totalRolls = 0,
-	totalEntries = 0,
 	tierolls = 0,
 	currentStakes = 0,
-	currentHighRoll = 0, 
-	currentLowRoll = 0,
-	currentTie = 0, 
+	--currentTie = 0, 
+	currentHighBreak = false, --TODO bool --TODO don't need a global
+	currentLowBreak = false, --TODO bool --TODO don't need a global
 	lowName = "",
 	highName = "",
-	currentHighBreak = 0, --TODO don't need a global
-	currentLowBreak = 0, --TODO don't need a global
 	tiehigh = 0, --TODO redundant. just use currentMax
 	tielow = 0, --TODO redundant. just use currentLow
 }
 
 local g_round = g_roundDefaults
-
---g_rollCmd = SLASH_RANDOM1:upper()
 
 local function ConvertRollToGold(value)
 	local tempValue = tonumber(value)
@@ -64,113 +63,90 @@ local function ResetRound()
 	g_round = g_roundDefaults
 	g_round.currentPhase = 0
 	g_round.entrants = {}
-
-	--GBC["strings"] = { }; --TODO ???
-	GBC["lowtie"] = { }; --TODO remove
-	GBC["hightie"] = { }; --TODO remove
+	g_round.entrantsCount = 0
+	g_round.acceptRolls = false
 	
 	ResetGBCFrames()
 
-	WriteMsg("", "", "|cffffff00GCG has now been reset");
+	WriteMsg("", "", "|cffffff00GCG has now been reset")
 end
 
 local function StartRound()
-
 	--Grab current stakes before resetting round defaults
-	g_app.savedStakes = GBC_EditBox_Stakes:GetText()
+	g_app.savedStakes = tonumber(GBC_EditBox_Stakes:GetText())
 	GBC_EditBox_Stakes:ClearFocus()
 
 	ResetRound()
 
 	g_round.acceptEntries = true
-	g_round.currentStakes = tonumber(g_app.savedStakes) 
-	g_round.currentLowRoll = g_round.currentStakes + 1
-	g_round.tielow = g_round.currentStakes + 1
+	g_round.currentStakes = g_app.savedStakes
+	g_round.tiehigh = 0
+	g_round.tielow = g_round.currentStakes
 
-	ChatMsg(format(".:The Greybeards Casino:. STAKES << %s >>", ConvertRollToGold(g_round.currentStakes)))
-	ChatMsg(".:Hi/Lo:. Lowest roller pays Highest roller the difference between rolls:.")
-	ChatMsg(format(".:Players will  /roll %s  .:. Type %s to Join  .:. Type %s to withdraw:.", 
-					g_round.currentStakes, 
-					g_app.chatEnterMsg, 
-					g_app.chatWithdrawMsg))
+	ChatMsg(format(".:GBC:. RULES: %s .:. STAKES << %s >>", g_app.rulesName, ConvertRollToGold(g_round.currentStakes)))
+	ChatMsg(format(".:GBC:. To enter: type %s", g_app.chatEnterMsg))
 
 	GBC_Btn_RoundNext:SetText("Announce Last Call")
 end
 
 local function AnnounceLastCall()
-	ChatMsg("Last Call to join!");
+	ChatMsg(format(".:GBC:. Last Call to join! If you're a pussy, type %s", g_app.chatWithdrawMsg))
 	GBC_Btn_RoundNext:SetText("Begin Rolling")
 end
 
 local function AnnounceRolling()
-	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
-	--if g_round.totalRolls > 0 and g_round.acceptRolls then
-	--	if table.getn(GBC.strings) ~= 0 then
-	--		ListRemainingPlayers()
-	--	end
-	--	return
-	--end
+	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", table.getn(g_round.entrants)))
 
-	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
+	if g_round.entrantsCount > 1 or (g_app.debug and g_round.entrantsCount > 0) then
 		g_round.acceptEntries = false 
-		g_round.acceptRolls = true 
-		if (g_round.currentTie == 0) then 
+		g_round.acceptRolls = true  
+
+		if not (g_round.currentLowBreak and g_round.currentHighBreak) then --(g_round.currentTie == 0) then 
 			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", g_round.currentStakes))
 		end
 
-		if (g_round.currentLowBreak == 1) then
+		if g_round.currentLowBreak then
 			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
-			ListRemainingPlayers()
 		end
 
-		if (g_round.currentHighBreak == 1) then
+		if g_round.currentHighBreak then
 			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
-			ListRemainingPlayers();
 		end
-
-		--GBC_EditBox:ClearFocus();
 	end
 
-	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
+	if g_round.acceptEntries and g_round.entrantsCount < 2 and not g_app.debug then
 		ChatMsg("Not enough Players!")
 	end
 
 	GBC_Btn_RoundNext:Disable()
-	GBC_Btn_RoundNext:SetText("Waiting for rolls")
+	GBC_Btn_RoundNext:SetText("Waiting for rolls...")
+	GBC_Btn_ListRemaining_Update();
 end
 
 function RoundWrapup()
-	if #g_round.highTyers <= 1 and #g_round.lowTyers <= 1 then
+	if table.getn(g_round.highTyers) <= 1 and table.getn(g_round.lowTyers) <= 1 then
 		ReportResults()
+		ResetRound()
+		ResetGBCFrames()
 		return
 	end
 
-	if #g_round.highTyers > 1 then
+	if table.getn(g_round.highTyers) > 1 then
 		HighTieBreaker()
 	end
 
-	if #g_round.lowTyers > 1 then
+	if table.getn(g_round.lowTyers) > 1 then
 		LowTieBreaker()
 	end
 end
-
 
 function ResetGBCFrames()
 	GBC_EditBox_Stakes:SetText(g_app.savedStakes)
 	GBC_Btn_RoundNext:SetText("Start Round")
 	GBC_Btn_RoundNext:Enable()
+	GBC_Btn_ListRemaining:Disable()
 
 	GBC_StatusInfo_Update()
-
-	--GBC_ROLL_Button:Disable();
-	--GBC_AcceptEntries_Button:Enable();
-	--GBC_LASTCALL_Button:Disable();
-	--GBC_CHAT_Button:Enable();
-
-	--if g_app.acceptedEntriesFrame ~= nil then
-	--	g_app.acceptedEntriesFrame.text:SetText("")
-	--	g_app.acceptedEntriesFrame:Hide()
-	--end
 end
 
 --TODO soft code this for different rule sets
@@ -186,78 +162,7 @@ local function NextPhase()
 	g_round.currentPhase = g_round.currentPhase + 1
 end
 
---local function GBC_OnClickROLL()
---	DebugWrite(string.format("Beginning Roll Phase w/ <%d> entries", g_round.totalRolls))
---	if g_round.totalRolls > 0 and g_round.acceptRolls then
---		if table.getn(GBC.strings) ~= 0 then
---			ListRemainingPlayers()
---		end
---		return
---	end
-
---	if g_round.totalRolls > 1 or (g_app.debug and g_round.totalRolls > 0) then
----		g_round.acceptEntries = false 
---		g_round.acceptRolls = true 
---		if (g_round.currentTie == 0) then 
---			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", currentStakes))
---		end
---
---		if (g_round.currentLowBreak == 1) then
---			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
---			ListRemainingPlayers()
---		end
---
---		if (g_round.currentHighBreak == 1) then
---			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
---			ListRemainingPlayers();
---		end
---
-		--GBC_EditBox:ClearFocus();
---	end
-
---	if g_round.acceptEntries and g_round.totalRolls < 2 and not g_app.debug then
---		ChatMsg("Not enough Players!");
---	end
---end
-
-
---function GBC_OnClickRoll()
-	--hash_SlashCmdList[g_rollCmd](g_round.currentStakes)
-	--hash_SlashCmdList[g_rollCmd](GBC_EditBox:GetText())
---end
-
---function GBC_OnClickRoll1()
---	ChatMsg(g_app.chatEnterMsg);
---end
-
---TODO remove JoinStats. unnecessary bloat that nobody will ever use
---Joins the stats for an alternate name
-local function JoinStats(msg)
-	local i = string.find(msg, " ");
-	if((not i) or i == -1 or string.find(msg, "[", 1, true) or string.find(msg, "]", 1, true)) then
-		ChatFrame1:AddMessage("");
-		return;
-	end
-
-	local mainname = string.sub(msg, 1, i-1);
-	local altname = string.sub(msg, i+1);
-
-	ChatFrame1:AddMessage(string.format("Joined alt '%s' -> main '%s'", altname, mainname));
-	GBC["joinstats"][altname] = mainname;
-end
-
-local function UnjoinStats(altname)
-	if(altname ~= nil and altname ~= "") then
-		ChatFrame1:AddMessage(string.format("Unjoined alt '%s' from any other characters", altname));
-		GBC["joinstats"][altname] = nil;
-	else
-		local i, e;
-		for i, e in pairs(GBC["joinstats"]) do
-			ChatFrame1:AddMessage(string.format("currently joined: alt '%s' -> main '%s'", i, e));
-		end
-	end
-end
-
+--TODO massively rework this
 local function PrintStats(showAllStats)
 	local sortlistname = {}
 	local sortlistamount = {}
@@ -349,52 +254,11 @@ function CloseRootFrame()
 	GBC_Root:Hide()
 end
 
---function ToggleMinimap()
---	g_app.showMinimap = not g_app.showMinimap
-
-	--if g_app.showMinimap then
-	--	GBC_MinimapButton:Show()
-	--else
-	--	GBC_MinimapButton:Hide()
-	--end
---end
-
---GBC_Settings = {
---	MinimapPos = 75
---}
--- ** do not call from the mod's OnLoad, VARIABLES_LOADED or later is fine. **
---function GBC_MinimapButton_Reposition()
-	--GBC_MinimapButton:SetPoint(
-	--	"TOPLEFT",
-	--	"Minimap",
-	--	"TOPLEFT",
-	--	52-(80*cos(GBC_Settings.MinimapPos)),
-	--	(80*sin(GBC_Settings.MinimapPos))-52)
---end
-
---TODO drag function does not work
---function GBC_MinimapButton_DraggingFrame_OnUpdate()
-	--local xpos,ypos = GetCursorPosition()
-	--local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
-
-	--xpos = xmin-xpos/UIParent:GetScale()+70
-	--ypos = ypos/UIParent:GetScale()-ymin-70
-
-	--GBC_Settings.MinimapPos = math.deg(math.atan2(ypos,xpos))
-	--GBC_MinimapButton_Reposition()
---end
-
-
---function GBC_MinimapButton_OnClick()
-	--DEFAULT_CHAT_FRAME:AddMessage(tostring(arg1).." was clicked.")
---end
-
 function ChangeChannel(channel)
 	g_app.customChannel = channel
 end
 
 function ResetStats()
-	--GBC["stats"] = { };
 	g_app.sessionStats = {}
 end
 
@@ -414,12 +278,6 @@ function ReportResults()
 	else
 		ChatMsg(".:GBC:. TIE! No payouts on this roll!")
 	end
-	
-	--Reset Game
-	ResetRound()
-	ResetGBCFrames()
-	--GBC_AcceptEntries_Button:SetText("Open Entry");
-	--GBC_CHAT_Button:Enable();
 end
 
 function HighTieBreaker()
@@ -427,9 +285,11 @@ function HighTieBreaker()
 	for roller in g_round.highTyers do
 		msgNames = format("%s, %s", msgNames, roller)
 		g_round.entrants[roller].rolled = false
+		g_round.entrants[roller].roll = -1
 	end
 
-	g_round.highTyers = {}
+	g_round.highTieBreakActive = true
+	--g_round.highTyers = {}
 
 	ChatMsg(format(".:GBC:. High Tiebreaker between: ", msgNames))
 end
@@ -439,171 +299,100 @@ function LowTieBreaker()
 	for roller in g_round.lowTyers do
 		msgNames = format("%s, %s", msgNames, roller)
 		g_round.entrants[roller].rolled = false
+		g_round.entrants[roller].roll = -1
 	end
 
-	g_round.lowTyers = {}
+	g_round.lowTieBreakActive = true
+	--g_round.lowTyers = {}
+
 	ChatMsg(format(".:GBC:. Low Tiebreaker between: ", msgNames))
-end
-
-function Tiebreaker()
-	g_round.tierolls = 0;
-	g_round.totalRolls = 0;
-	g_round.currentTie = 1;
-	if table.getn(GBC.lowtie) == 1 then
-		GBC.lowtie = {}; --TODO move to g_round
-	end
-	if table.getn(GBC.hightie) == 1 then
-		GBC.hightie = {}; --TODO move to g_round
-	end
-	g_round.totalRolls = table.getn(GBC.lowtie) + table.getn(GBC.hightie);
-	g_round.tierolls = g_round.totalRolls;
-	if (table.getn(GBC.hightie) == 0 and table.getn(GBC.lowtie) == 0) then
-		ReportResults();
-	else
-		g_round.acceptRolls = false;
-		if table.getn(GBC.lowtie) > 0 then
-			g_round.currentLowBreak = 1;
-			g_round.currentHighBreak = 0;
-			g_round.tielow = g_round.currentStakes+1;
-			g_round.tiehigh = 0;
-			g_round.entrants = GBC.lowtie
-			--GBC.strings = GBC.lowtie; --TODO move to g_round
-			GBC.lowtie = {}; --TODO move to g_round
-			GBC_OnClickROLL(); --TODO local function
-		end
-		if table.getn(GBC.hightie) > 0  and #g_round.entrants == 0 then
-			g_round.currentLowBreak = 0;
-			g_round.currentHighBreak = 1;
-			g_round.tielow = g_round.currentStakes+1;
-			g_round.tiehigh = 0;
-			g_round.entrants = GBC.hightie; --TODO move to g_round
-			GBC.hightie = {}; --TODO move to g_round
-			GBC_OnClickROLL(); --TODO local function
-		end
-	end
 end
 
 function ParseChatMsg(msg, username)
 	if msg == g_app.chatEnterMsg then
 		AddPlayer(username);
 	elseif msg == g_app.chatWithdrawMsg then
-		RemovePlayer(username);
+		WithdrawPlayer(username);
 	end
 end
 
 function ParseRoll(msg)
-	local player, junk, roll, range = strsplit(" ", msg)
+	local playerName, junk, roll, range = strsplit(" ", msg)
+	local player = g_round.entrants[playerName]
 
-	if junk == "rolls" and g_round.entrants[player] ~= nil and not g_round.entrants[player].rolled then
-		minRoll, maxRoll = strsplit("-", range)
-		minRoll = tonumber(strsub(minRoll,2))
-		maxRoll = tonumber(strsub(maxRoll,1,-2))
-		roll = tonumber(roll)
-		
-		if minRoll ~= 1 or maxRoll ~= g_round.currentStakes then 
-			--TODO some error output
-			return
-		end
+	if player == nil or not player.entered or player.rolled or junk ~= "rolls" then
+		return
+	end 
 
-		g_round.entrants[player].roll = roll
-		g_round.entrants[player].rolled = true
+	--local highTieRoll = false
+	--if g_round.highTieBreakActive and g_round.highTyers[playerName] ~= nil then
+	--	highTieRoll = true
+	--end
 
-		if roll > GetCurrentHighRoll() then
-			g_round.highRoller = player
-			g_round.highTyers = { player }
-		elseif roll == GetCurrentHighRoll() then 
-			table.insert(g_round.highTyers, player)
-		end
-
-		if roll < GetCurrentLowRoll() then
-			g_round.lowRoller = player
-			g_round.lowTyers = { player }
-		elseif roll == GetCurrentLowRoll() then 
-			table.insert(g_round.lowTyers, player)
-		end
-		
-		--TIE Breaker logic
-		--if g_round.currentTie == 0 then --TODO this needs to be a bool
-			--if roll == g_round.currentHighRoll then
-			--	if table.getn(GBC.hightie) == 0 then
-			--		AddTiedPlayer(g_round.highName, GBC.hightie)
-			--	end
-			--	AddTiedPlayer(player, GBC.hightie)
-			--end
-			
-			--if roll > g_round.currentHighRoll then
-			--	g_round.highName = player
-			--	g_round.currentHighRoll = roll
-				--TODO cleanup
-			--	GBC.hightie = {}
-			--end
-			
-			--if roll == g_round.currentLowRoll then
-			--	if table.getn(GBC.lowtie) == 0 then
-			--		AddTiedPlayer(g_round.lowName, GBC.lowtie)
-			--	end
-			--	AddTiedPlayer(player, GBC.lowtie)
-			--end
-			
-			--if roll < g_round.currentLowRoll then
-			--	g_round.lowName = player
-			--	g_round.currentLowRoll = roll
-				--TODO cleanup
-			--	GBC.lowtie = {}
-			--end
-		--else
-		if g_round.currentTie ~= 0 then
-			if g_round.currentLowBreak == 1 then
-				if roll == g_round.tielow then
-					if table.getn(GBC.lowtie) == 0 then
-						AddTiedPlayer(g_round.lowName, GBC.lowtie)
-					end
-					AddTiedPlayer(player, GBC.lowtie)
-				end
-				if roll < g_round.tielow then
-					g_round.lowName = player
-					g_round.tielow = roll
-					GBC.lowtie = {}
-				end
-			end
-			
-			if g_round.currentHighBreak == 1 then
-				if roll == g_round.tiehigh then
-					if table.getn(GBC.hightie) == 0 then
-						AddTiedPlayer(g_round.highName, GBC.hightie)
-					end
-					AddTiedPlayer(player, GBC.hightie)
-				end
-				if roll > g_round.tiehigh then
-					g_round.highName = player
-					g_round.tiehigh = roll
-					GBC.hightie = {}
-				end
-			end
-		end
-
-		--DebugWrite(string.format("Accepted roll. Removing player %s", player))
-		
-		--RemovePlayer(player)
-		--g_round.totalEntries = g_round.totalEntries + 1
-
-		if GetRemainingToRollCount() == 0 then
-			RoundWrapup()
-		end
-		
-		GBC_StatusInfo_Update()
+	minRoll, maxRoll = strsplit("-", range)
+	minRoll = tonumber(strsub(minRoll,2))
+	maxRoll = tonumber(strsub(maxRoll,1,-2))
+	roll = tonumber(roll)
+	
+	if minRoll ~= 1 or maxRoll ~= g_round.currentStakes and (roll > maxRoll or roll < minRoll) then 
+		DebugWrite("Invalid roll parsed!")
+		return
 	end
-end
 
---TODO table contains player function
-function GBC_Check(player)	
-	return GBC.string[player] ~= nil
-	--for i=1, table.getn(GBC.strings) do
-	--	if GBC.strings[i] == player then
-	--		return true
+	player.rolled = true
+	player.roll = roll
+
+	if roll > GetCurrentHighRoll() then
+		g_round.highRoller = playerName
+		g_round.highTyers = { playerName }
+	elseif roll == GetCurrentHighRoll() then 
+		table.insert(g_round.highTyers, playerName)
+	end
+
+	if roll < GetCurrentLowRoll() then
+		g_round.lowRoller = playerName
+		g_round.lowTyers = { playerName }
+	elseif roll == GetCurrentLowRoll() then 
+		table.insert(g_round.lowTyers, playerName)
+	end
+
+	if GetRemainingToRollCount() == 0 then
+		RoundWrapup()
+	end
+	
+	GBC_StatusInfo_Update()
+	GBC_Btn_ListRemaining_Update()
+	
+	--TODO REMOVE this tie logic
+	--if g_round.currentTie ~= 0 then
+	--if g_round.currentLowBreak then
+	--	if roll == g_round.tielow then
+	--		if table.getn(GBC.lowtie) == 0 then
+	--			AddTiedPlayer(g_round.lowName, GBC.lowtie)
+	--		end
+	--		AddTiedPlayer(player, GBC.lowtie)
+	--	end
+	--	if roll < g_round.tielow then
+	--		g_round.lowName = player
+	--		g_round.tielow = roll
+	--		GBC.lowtie = {}
 	--	end
 	--end
-	--return false
+	
+	--if g_round.currentHighBreak then
+	--	if roll == g_round.tiehigh then
+	--		if table.getn(GBC.hightie) == 0 then
+	--			AddTiedPlayer(g_round.highName, GBC.hightie)
+	--		end
+	--		AddTiedPlayer(player, GBC.hightie)
+	--	end
+	--	if roll > g_round.tiehigh then
+	--		g_round.highName = player
+	--		g_round.tiehigh = roll
+	--		GBC.hightie = {}
+	--	end
+	--end
+	--end
 end
 
 function GetCurrentHighRoll()
@@ -633,70 +422,59 @@ function AddPlayer(name)
 	end
 
 	local charname, realmname = strsplit("-",name)
-	print(format("charname %s", charname))
-	print(g_round.entrants[charname])
 	if charname ~= nil and g_round.entrants[charname] == nil then
 		entrantInfo = { 
 			name = charname,
 			rolled = false,
-			roll = -1 
+			roll = -1,
+			entered = true 
 		}
 
 		g_round.entrants[charname] = entrantInfo
-		--table.insert(g_round.entrants, #g_round.entrants, entrantInfo)
-		--print(g_round.entrants[charname].name)
-		--print("tset"..#g_round.entrants) 
-		--TODO totalRolls cleanup
+		g_round.entrantsCount = g_round.entrantsCount + 1
 		g_round.totalRolls = g_round.totalRolls+1
 
 		DebugWrite(format("Added player: %s", charname))
 	end
 	
-	--if not GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 1 then
-	--	GBC_LASTCALL_Button:Enable();
-	--end
-	
-	--if g_round.totalRolls == 2 then
-	--	GBC_AcceptEntries_Button:Disable();
-	--	GBC_AcceptEntries_Button:SetText("Open Entry");
-	--end
-
-	--UpdateStatusInfo()
 	GBC_StatusInfo_Update()
 end
 
---TODO remove this entire thing
---function RemovePlayer(name)
---	local charname, realmname = strsplit("-",name)
---	local insname = charname
+function WithdrawPlayer(name)
+	if g_round.entrants[name] == nil then
+		return
+	end
 
-	--for i=1, table.getn(GBC.strings) do
-	--	if GBC.strings[i] ~= nil then
-	--	  	if strlower(GBC.strings[i]) == strlower(insname) then
-	--			table.remove(GBC.strings, i)
-	--			g_round.totalRolls = g_round.totalRolls - 1;
---
-	--			DebugWrite(format("Removed player %s", insname))
-	--		end
-	--	end
-	--end
-	
-	--if (GBC_LASTCALL_Button:IsEnabled() and g_round.totalRolls == 0) then
-	--	GBC_LASTCALL_Button:Disable();
-	--end
-	
-	--if g_round.totalRolls == 1 then
-	--	GBC_AcceptEntries_Button:Enable();
-	--	GBC_AcceptEntries_Button:SetText("Open Entry");
-	--end
---end
+	g_round.entrants[name].entered = false
+end
 
---TODO remove, 
+function GBC_Btn_ListRemaining_Update()
+	DebugWrite(format("list %d", GetRemainingToRollCount()))
+	if GetRemainingToRollCount() > 0 then
+		GBC_Btn_ListRemaining:Enable()
+	else
+		GBC_Btn_ListRemaining:Disable()
+	end
+end
+
 function ListRemainingPlayers()
-	--for i=1, table.getn(GBC.strings) do
-	--  	local msg = strjoin(" ", "", tostring(GBC.strings[i]):gsub("^%l", string.upper),"still needs to roll.")
-	--	ChatMsg(msg);
-	--end
+	local strRollers = ""
+	for player, info in pairs(g_round.entrants) do
+		if not info.rolled then
+			local delim = ", "
+			if strRollers == "" then
+				delim = ""
+			end
+
+			strRollers = player..delim..strRollers
+		end	
+	end
+
+	local msg = format("Remaining Rollers: %s", strRollers)
+	if strRollers == "" then
+		msg = "Everyone has rolled."
+	end
+	ChatMsg(msg)
 end
 
 function GetRemainingToRollCount()
@@ -709,52 +487,38 @@ function GetRemainingToRollCount()
 	return remainCount
 end
 
-
+--TODO rework bans
 function ListBannedPlayers()
-	local bancnt = 0;
+	--local bancnt = 0;
 	WriteMsg("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
-	for i=1, table.getn(GBC.bans) do
-		bancnt = 1;
+	--for i=1, table.getn(g_app.banList) do
+	--	bancnt = 1;
 		--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
-	end
-	if (bancnt == 0) then
+	--end
+	--if (bancnt == 0) then
 		--DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
-	end
+	--end
 end
 
---TODO table contains
 function IsBanned(name)
-	local charname, realmname = strsplit("-",name);
-	local insname = charname;
-	
-	--TODO check if contained in table
-	if (insname ~= nil or insname ~= "") then
-		for i=1, table.getn(GBC.bans) do
-			if strlower(GBC.bans[i]) == strlower(insname) then
-				return true
-			end
-		end
-	end
-	return false
+	local charname, realmname = strsplit("-",name)
+	return g_app.banList[charname] ~= nil
 end
 
 function AddBannedPlayer(name)
-	local charname, realmname = strsplit("-", name);
-	local insname = charname;
+	local charname, realmname = strsplit("-", name)
 	
-	if (insname ~= nil or insname ~= "") then
-		WriteMsg("", "", "|cffffff00Error: No name provided.");
+	if charname == nil or charname == "" then
+		WriteMsg("", "", "|cffffff00Error: No name provided.")
 		return
 	end
 	
-	for i=1, table.getn(GBC.bans) do
-		if GBC.bans[i] == insname then
-			WriteMsg("", "", "|cffffff00Unable to add to ban list - user already banned.");
-			return
-		end
+	if IsBanned(charname) then
+		WriteMsg("", "", "|cffffff00Unable to add to ban list - user already banned.");
+		return
 	end
-	
-	table.insert(GBC.bans, insname)
+
+	table.insert(g_app.banList, charname)
 	WriteMsg("", "", "|cffffff00User is now banned!");
 	--local banMsg = strjoin(" ", "", "User Banned from rolling! -> ",insname, "!")
 	--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", banMsg));
@@ -762,41 +526,52 @@ end
 
 function RemoveBannedPlayer(name)
 	local charname, realmname = strsplit("-",name);
-	local insname = charname;
-	if (insname ~= nil or insname ~= "") then
-		for i=1, table.getn(GBC.bans) do
-			if GBC.bans[i] == insname then
-				table.remove(GBC.bans, i)
-				WriteMsg("", "", "|cffffff00User removed from ban successfully.");
-				return;
-			end
-		end
-	else
-		WriteMsg("", "", "|cffffff00Error: No name provided.");
+
+	if charname == nil or charname == "" then
+		DebugWrite("BAN Remove - No Name provided")
+		return
 	end
+
+	table.remove(g_app.banList, charname)
+	WriteMsg("", "", "|cffffff00User removed from ban successfully.");
+
+	--local insname = charname;
+	--if (insname ~= nil or insname ~= "") then
+	--	for i=1, table.getn(GBC.bans) do
+	--		if GBC.bans[i] == insname then
+	--			table.remove(GBC.bans, i)
+	--			WriteMsg("", "", "|cffffff00User removed from ban successfully.");
+	--			return;
+	--		end
+	--	end
+	--else
+	--	WriteMsg("", "", "|cffffff00Error: No name provided.");
+	--end
 end
 
-function AddTiedPlayer(name, tietable)
-	local charname, realmname = strsplit("-",name)
-	local insname = charname
-	
-	if (insname ~= nil or insname ~= "") then
-		local exists = false;
-		for i=1, table.getn(tietable) do
-		  	if tietable[i] == insname then
-				exists = true;
-			end
-		end
-		if not exists then
-		    table.insert(tietable, insname)
-			g_round.tierolls = g_round.tierolls+1
-			g_round.totalRolls = g_round.totalRolls+1
-		end
-	end
-end
+--TODO remove, part of old parse roll logic
+--function AddTiedPlayer(name, tietable)
+--	local charname, realmname = strsplit("-",name)
+--	local insname = charname
+--	
+--	if (insname ~= nil or insname ~= "") then
+--		local exists = false;
+--		for i=1, table.getn(tietable) do
+--		  	if tietable[i] == insname then
+--				exists = true;
+--			end
+--		end
+--		if not exists then
+--		    table.insert(tietable, insname)
+--			g_round.tierolls = g_round.tierolls+1
+--			g_round.totalRolls = g_round.totalRolls+1
+--		end
+--	end
+--end
 
 --Display all player info in the status panel
 function GBC_StatusInfo_Update()
+	--Clear status frames
 	if g_round == nil or g_round.entrants == nil or next(g_round.entrants) == nil then
 		for idx=1, 15, 1 do
 			local f = getglobal("GBC_StatusEntry_"..(idx))
@@ -807,13 +582,14 @@ function GBC_StatusInfo_Update()
 		return
 	end
 
+	--Fill status frames with entrant info
 	local idx = 1
 	for key,value in pairs(g_round.entrants) do
 		local f = getglobal("GBC_StatusEntry_"..(idx))
 		if f ~= nil then 
 			local rollText = tostring(value.roll)
-			if tonumber(value.roll) < 0 then
-				rollText = "NOROLL"
+			if not value.entered or tonumber(value.roll) < 0 then
+				rollText = "X"
 			end
 
 	  		f:SetText(format("%d. %s - [ %s ]", 
@@ -855,7 +631,6 @@ function DebugWrite(msg)
 	end
 end
 
-
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
@@ -868,7 +643,7 @@ function GBC_OnLoad(self)
 	self:RegisterEvent("CHAT_MSG_GUILD")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	
 	self:RegisterForDrag("LeftButton");
     
@@ -881,50 +656,6 @@ function GBC_OnLoad(self)
 end
 
 function GBC_OnEvent(self, event, ...)
-	if event == "PLAYER_ENTERING_WORLD" then
-		--TODO remove
-		if(not GBC) then
-			GBC = {
-				--["chat"] = 1,
-				--["strings"] = { },
-				["lowtie"] = { }, --TODO remove
-				["hightie"] = { }, --TODO remove
-				["bans"] = { },
-			}
-		--TODO cleanup crossgambling relic
-		-- fix older legacy items for new chat channels.  Probably need to iterate through each to see if it should be set.
-		--elseif tostring(type(GBC["chat"])) ~= "number" then
-		--	GBC["chat"] = 1
-		end
-
-		--if(not GBC["stats"]) then 			GBC["stats"] 		= { }; end
-		if(not GBC["joinstats"]) then 		GBC["joinstats"] 	= { }; end
-		--if(not GBC["chat"]) then 			GBC["chat"] 		= 1; end
-		if(not GBC["bans"]) then 			GBC["bans"] 		= { }; end
-	
-		--TODO UI initialization
-		--GBC_EditBox:SetJustifyH("CENTER");
-		--GBC_EditBox:SetText(g_app.lastRoll);
-
-		--SetChatTarget
-		--g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-		--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod)); 
-
-		--MiniMap
-		--if g_app.showMinimap then
-		--	GBC_MinimapButton:Show()
-		--else
-		--	GBC_MinimapButton:Hide()
-		--end
-
-		--TODO move to ?? idk
-		--if(GBC["active"] == 1) then
-		--	GBC_Frame:Show();
-		--else
-		--	GBC_Frame:Hide();
-		--end
-	end
-
 	-- CHAT PARSING 
 	--TODO clean this up. sloppy string checking
 	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and g_app.currentChatMethod == "RAID") then
@@ -959,24 +690,6 @@ function GBC_OnEvent(self, event, ...)
 		ParseRoll(msg);
 	end
 end
-
---TODO cleanup slop
---local EventFrame=CreateFrame("Frame");
--- Need to register an event to receive it
---EventFrame:RegisterEvent("CHAT_MSG_WHISPER");
---EventFrame:SetScript("OnEvent", function(self,event,msg,sender)
-	--We're making sure the command is case insensitive by casting it to lowercase before running a pattern check
---    if msg:lower():find("!stats") then
---        ChatMsg("Work in Progress","WHISPER",nil,sender);
---    end
---end);
-
---local function OptionsFormatter(text, prefix)
---	if prefix == "" or prefix == nil then 
---		prefix = "/gbc" 
---	end
---	DEFAULT_CHAT_FRAME:AddMessage(string.format("%s%s%s: %s", GREEN_FONT_COLOR_CODE, prefix, FONT_COLOR_CODE_CLOSE, text))
---end
 
 function GBC_EditBox_Stakes_OnLoad()
     GBC_EditBox_Stakes:SetNumeric(true);
@@ -1022,159 +735,33 @@ function GBC_Btn_ChatBroadcast_OnLoad()
 	UIDropDownMenu_JustifyText(GBC_Btn_ChatBroadcast, "LEFT")
 end
 
---TODO remove
---function GBC_Btn_ChatBroadcast_OnClick()
-	--TODO cleanup, find a clean way to loop over available chat channels
-	--TODO remove this redundant GBC["chat"]
---	if(GBC["chat"] == nil) then 
---		GBC["chat"] = 1 
---	end
-
---	GBC["chat"] = (GBC["chat"] % #g_app.chatMethods) + 1
---	g_app.currentChatMethod = g_app.chatMethods[GBC["chat"]]
-
---	GBC_Btn_ChatBroadcast:SetText(format("Broadcast to: %s", g_app.currentChatMethod))
-	
-	--GBC_CHAT_Button:SetText(string.format("Broadcast Gambling to: %s", g_app.currentChatMethod))
-	--print(g_app.currentChatMethod)
---	WriteMsg("","",string.format("Channel set to: %s", g_app.currentChatMethod))
-	--if g_app.currentChatMethod == "CHANNEL" then
-	--	WriteMsg("","",string.format("Custom channel set to: %s", g_app.customChannel))
-	--end
---end
-
 function GBC_Btn_StatsDisplay_OnClick()
 	PrintStats(false)
 end
 
---TODO
 function GBC_Btn_StatsReset_OnClick()
-
+	ResetStats()
 end
-
---function GBC_Reset()
---	GBC["strings"] = { }; --TODO ???
---	GBC["lowtie"] = { }; --TODO remove
---	GBC["hightie"] = { }; --TODO remove
-	
---	g_round = g_roundDefaults
-	
-	--GBC_ResetUI()
-	
-	--GBC_AcceptEntries_Button:SetText("Open Entry");
---	WriteMsg("", "", "|cffffff00GCG has now been reset");
---end
-
---function GBC_ResetCmd()
---	ChatMsg(".:GBC:. Game has been reset", chatmethod)
---end
 
 function GBC_Btn_RoundNext_OnClick()
 	NextPhase()
+end
+
+function GBC_Btn_ListRemaining_OnClick()
+	ListRemainingPlayers()
 end
 
 function GBC_Btn_RoundReset_OnClick()
 	ResetRound()
 end
 
---TODO attach a function callback to each slash command
---		cuts out 90% of this vertical space
---function GBC_SlashCmd(msg)
+function GetVersionString()
+	return g_app.version
+end
 
-
-	--local msg = msg:lower()
-	
-	--if (msg == "" or msg == nil) then
-	--    WriteMsg("", "", "~Following commands for GreybeardsCasino~")
-	--	WriteMsg("", "", "show - Shows the frame")
-	--	WriteMsg("", "", "hide - Hides the frame")
-	--	WriteMsg("", "", "channel - Change the custom channel for gambling")
-	--	WriteMsg("", "", "reset - Resets the AddOn")
-	--	WriteMsg("", "", "fullstats - list full stats")
-	--	WriteMsg("", "", "resetstats - Resets the stats")
-	--	WriteMsg("", "", "joinstats [main] [alt] - Apply [alt]'s win/losses to [main]")
-	--	WriteMsg("", "", "minimap - Toggle minimap show/hide")
-	--	WriteMsg("", "", "unjoinstats [alt] - Unjoin [alt]'s win/losses from whomever it was joined to")
-	--	WriteMsg("", "", "ban - Ban's the user from being able to roll")
-	--	WriteMsg("", "", "unban - Unban's the user")
-	--	WriteMsg("", "", "listban - Shows ban list")
-	--	WriteMsg("", "", "debug {enable|disable}")
-	--	return
-	--end
-	
-	--if (msg == "hide") then
-	--	CloseRootFrame()
-	--	return
-	--end
-	
-	--if (msg == "show") then
-	--	OpenRootFrame()
-	--	return
-	--end
-	
-	--if (msg == "reset") then
-	--	GBC_Reset()
-	--	return
-	--end
-	
-	--if (msg == "fullstats") then
-	--	PrintStats(true)
-	--	return
-	--end
-	
-	--if (msg == "resetstats") then
-	--	ResetStats()
-	--	return
-	--end
-	
-	--if (msg == "minimap") then
-	--	ToggleMinimap()
-	--	return
-	--end
-	
-	--if (string.sub(msg, 1, 7) == "channel") then
-	--	ChangeChannel(strsub(msg, 9))
-	--	return
-	--end
-	
-	--if (string.sub(msg, 1, 9) == "joinstats") then
-	--	JoinStats(strsub(msg, 11))
-	--	return
-	--end
-	
-	--if (string.sub(msg, 1, 11) == "unjoinstats") then
-	--	UnjoinStats(strsub(msg, 13))
-	--	return
-	--end
-
-	--if (string.sub(msg, 1, 3) == "ban") then
-	--	AddBannedPlayer(strsub(msg, 5))
-	--	return
-	--end
-
-	--if (string.sub(msg, 1, 5) == "unban") then
-	--	RemoveBannedPlayer(strsub(msg, 7))
-	--	return
-	--end
-
-	--if (string.sub(msg, 1, 7) == "listban") then
-	--	ListBannedPlayers()
-	--	return
-	--end
-
-	--if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,13) == "enable") then
-	--	DebugMode(true)
-	--	return
-	--end
-
-	--if(string.sub(msg,1,5) == "debug" and string.sub(msg,7,14) == "disable") then
-	--	DebugMode(false)
-	--	return
-	--end
-
-	--Fallthrough
-	--WriteMsg("", "", "|cffffff00Invalid argument for command /cg")
---end
+function DisplayVersion()
+	WriteMsg("","", format("GreybeardsCasino v%s", GetVersionString()))
+end
 
 local g_cmds = {
 	show = {
@@ -1196,6 +783,11 @@ local g_cmds = {
 		cmd = "debug",
 		func = DebugMode,
 		description = "Debug mode { on | off }"
+	},
+	version = {
+		cmd = "version",
+		func = DisplayVersion,
+		description = "Display current addon version."
 	}
 }
 
@@ -1217,7 +809,6 @@ end
 
 SLASH_GBC1 = "/gbc"
 SlashCmdList["GBC"] = GBC_SlashCmd
-
 
 --MINIMAP BUTTON
 function GBC_MinimapBtn_DraggingFrame_OnUpdate()
