@@ -39,8 +39,6 @@ local g_roundDefaults = {
 	lowRoller = nil, 
 	highTyers = {},
 	lowTyers = {},
-	--currentHighBreak = false, --TODO bool --TODO don't need a global
-	--currentLowBreak = false, --TODO bool --TODO don't need a global
 	highTieBreakActive = false,
 	highTieHighRoller = nil,
 	hightieHighTyers = {},
@@ -51,10 +49,6 @@ local g_roundDefaults = {
 	lowtieHighTyers = {},
 	lowTieLowRoller = nil,
 	lowtieLowTyers = {},
-	--lowName = "",
-	--highName = "",
-	--tiehigh = 0, --TODO redundant. just use currentMax
-	--tielow = 0, --TODO redundant. just use currentLow
 }
 
 local g_round = g_roundDefaults
@@ -195,9 +189,9 @@ local function PrintStats(showAllStats)
 	local i, j, k
 
 	for name, totalWon in pairs(g_app.sessionStats) do
-		if(GBC["joinstats"][strlower(name)] ~= nil) then
-			name = GBC["joinstats"][strlower(name)]:gsub("^%l", string.upper)
-		end
+	--	if(GBC["joinstats"][strlower(name)] ~= nil) then
+	--		name = GBC["joinstats"][strlower(name)]:gsub("^%l", string.upper)
+	--	end
 		for k=0,n do
 			if(k == n) then
 				sortlistname[n] = name
@@ -259,6 +253,7 @@ local function PrintStats(showAllStats)
 	end
 end
 
+--TODO soft code rule sets
 function PrintRules()
 	ChatMsg(format(".:GBC:. %s RULES:.", g_app.rulesName))
 	ChatMsg(".:Players will /roll STAKES:.")
@@ -333,7 +328,6 @@ function LowTieBreaker()
 	end
 
 	g_round.lowTieBreakActive = true
-	--g_round.lowTyers = {}
 
 	ChatMsg(format(".:GBC:. Low Tiebreaker between: ", msgNames))
 end
@@ -421,37 +415,6 @@ function ParseRoll(msg)
 	
 	GBC_StatusInfo_Update()
 	GBC_Btn_ListRemaining_Update()
-	
-	--TODO REMOVE this tie logic
-	--if g_round.currentTie ~= 0 then
-	--if g_round.currentLowBreak then
-	--	if roll == g_round.tielow then
-	--		if table.getn(GBC.lowtie) == 0 then
-	--			AddTiedPlayer(g_round.lowName, GBC.lowtie)
-	--		end
-	--		AddTiedPlayer(player, GBC.lowtie)
-	--	end
-	--	if roll < g_round.tielow then
-	--		g_round.lowName = player
-	--		g_round.tielow = roll
-	--		GBC.lowtie = {}
-	--	end
-	--end
-	
-	--if g_round.currentHighBreak then
-	--	if roll == g_round.tiehigh then
-	--		if table.getn(GBC.hightie) == 0 then
-	--			AddTiedPlayer(g_round.highName, GBC.hightie)
-	--		end
-	--		AddTiedPlayer(player, GBC.hightie)
-	--	end
-	--	if roll > g_round.tiehigh then
-	--		g_round.highName = player
-	--		g_round.tiehigh = roll
-	--		GBC.hightie = {}
-	--	end
-	--end
-	--end
 end
 
 function GetCurrentHighRoll()
@@ -587,15 +550,7 @@ end
 
 --TODO rework bans
 function ListBannedPlayers()
-	--local bancnt = 0;
 	WriteMsg("", "", "|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name) - The Current Bans:");
-	--for i=1, table.getn(g_app.banList) do
-	--	bancnt = 1;
-		--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", "...", tostring(GBC.bans[i])));
-	--end
-	--if (bancnt == 0) then
-		--DEFAULT_CHAT_FRAME:AddMessage("|cffffff00To ban do /gbc ban (Name) or to unban /gbc unban (Name).");
-	--end
 end
 
 function IsBanned(name)
@@ -618,8 +573,6 @@ function AddBannedPlayer(name)
 
 	table.insert(g_app.banList, charname)
 	WriteMsg("", "", "|cffffff00User is now banned!");
-	--local banMsg = strjoin(" ", "", "User Banned from rolling! -> ",insname, "!")
-	--DEFAULT_CHAT_FRAME:AddMessage(strjoin("|cffffff00", banMsg));
 end
 
 function RemoveBannedPlayer(name)
@@ -632,40 +585,7 @@ function RemoveBannedPlayer(name)
 
 	table.remove(g_app.banList, charname)
 	WriteMsg("", "", "|cffffff00User removed from ban successfully.");
-
-	--local insname = charname;
-	--if (insname ~= nil or insname ~= "") then
-	--	for i=1, table.getn(GBC.bans) do
-	--		if GBC.bans[i] == insname then
-	--			table.remove(GBC.bans, i)
-	--			WriteMsg("", "", "|cffffff00User removed from ban successfully.");
-	--			return;
-	--		end
-	--	end
-	--else
-	--	WriteMsg("", "", "|cffffff00Error: No name provided.");
-	--end
 end
-
---TODO remove, part of old parse roll logic
---function AddTiedPlayer(name, tietable)
---	local charname, realmname = strsplit("-",name)
---	local insname = charname
---	
---	if (insname ~= nil or insname ~= "") then
---		local exists = false;
---		for i=1, table.getn(tietable) do
---		  	if tietable[i] == insname then
---				exists = true;
---			end
---		end
---		if not exists then
---		    table.insert(tietable, insname)
---			g_round.tierolls = g_round.tierolls+1
---			g_round.totalRolls = g_round.totalRolls+1
---		end
---	end
---end
 
 --Display all player info in the status panel
 function GBC_StatusInfo_Update()
@@ -757,7 +677,6 @@ function GBC_OnLoad(self)
 	self:RegisterEvent("CHAT_MSG_GUILD")
 	self:RegisterEvent("CHAT_MSG_SAY")
 	self:RegisterEvent("CHAT_MSG_SYSTEM")
-	--self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	
 	self:RegisterForDrag("LeftButton");
     
