@@ -70,7 +70,7 @@
 				</Layers>
 			</Frame><!-- GBC_Header -->
 			<Frame name="GBC_Panel_Upper">
-				<Size y="146"/>
+				<Size y="168"/>
 				<Anchors>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
@@ -135,11 +135,23 @@
 									</OnClick>
 								</Scripts>
 							</Button> <!--GBC_Btn_ChatBroadcast -->
-							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Display Stats">
+							<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
 								<Size y="26"/>
 								<Anchors>
 									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_RulesDisplay_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button> <!--GBC_Btn_RulesDisplay-->
+							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Broadcast Stats">
+								<Size y="26"/>
+								<Anchors>
+									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 								</Anchors>
 								<Scripts>
 									<OnClick>
@@ -480,17 +492,19 @@
 		</Anchors>
 		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 		<Layers>
-			<Layer level="OVERLAY">
+			<Layer level="OVERLAY" textureSubLevel="1">
 				<Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\GreybeardsCasino\media\icon">
-					<Size x="22" y="22"/>
+					<Size x="18" y="18"/>
 					<Anchors>
 						<Anchor point="TOPLEFT">
 							<Offset x="7" y="-6"/>
 						</Anchor>
 					</Anchors>
 				</Texture>
+			</Layer>
+			<Layer level="OVERLAY" textureSubLevel="2">
 				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
-					<Size x="56" y="56"/>
+					<Size x="48" y="48"/>
 					<Anchors>
 						<Anchor point="TOPLEFT"/>
 					</Anchors>
