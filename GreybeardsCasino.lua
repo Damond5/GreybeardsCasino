@@ -2,6 +2,7 @@
 --Author: Looch
 
 local g_app = {
+	debug = false,
 	showing = true,
 	customChannel = "GreybeardsCasino",
 	chatEnterMsg = "1",
@@ -17,7 +18,6 @@ local g_app = {
 	savedStakes = 100,
 	showMinimap = false,
 	acceptedEntriesFrame = nil,
-	debug = true,
 	sessionStats = {},
 	minimapPosition = 75,
 	rulesName = "Hi/Lo",
@@ -33,25 +33,22 @@ local g_roundDefaults = {
 	entrantsCount = 0,
 	acceptEntries = false,
 	acceptRolls = false,
-	totalRolls = 0, --TODO remove
-	tierolls = 0,
 	highRoller = nil,
 	lowRoller = nil, 
 	highTyers = {},
 	lowTyers = {},
-	highTieBreakActive = false,
-	highTieHighRoller = nil,
-	hightieHighTyers = {},
-	highTieLowRoller = nil,
-	hightieLowTyers = {},
-	lowTieBreakActive = false,
-	lowTieHighRoller = nil,
-	lowtieHighTyers = {},
-	lowTieLowRoller = nil,
-	lowtieLowTyers = {},
 }
 
 local g_round = g_roundDefaults
+
+local function has_value(arr, val) 
+	for index, value in ipairs(arr) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
 
 local function ConvertRollToGold(value)
 	local tempValue = tonumber(value)
@@ -70,24 +67,12 @@ end
 local function ResetRound()
 	g_round = g_roundDefaults
 	g_round.currentPhase = 0
-	g_round.entrants = {}
 	g_round.entrantsCount = 0
 	g_round.acceptRolls = false
-
-	g_round.highTieBreakActive = false
-	g_round.highTieHighRoller = nil
-	g_round.hightieHighTyers = {}
-	g_round.highTieLowRoller = nil
-	g_round.hightieLowTyers = {}
-	g_round.lowTieBreakActive = false
-	g_round.lowTieHighRoller = nil
-	g_round.lowtieHighTyers = {}
-	g_round.lowTieLowRoller = nil
-	g_round.lowtieLowTyers = {}
 	
 	ResetGBCFrames()
 
-	WriteMsg("", "", "|cffffff00GCG has now been reset")
+	WriteMsg("", "", "|cffffff00GCG Round has now been reset")
 end
 
 local function StartRound()
@@ -97,19 +82,21 @@ local function StartRound()
 
 	ResetRound()
 
+	g_round.entrants = {}
+	g_round.highRoller = nil
+	g_round.lowRoller = nil
 	g_round.acceptEntries = true
 	g_round.currentStakes = g_app.savedStakes
-	g_round.tiehigh = 0
-	g_round.tielow = g_round.currentStakes
 
-	ChatMsg(format(".:GBC:. RULES: %s .:. STAKES << %s >>", g_app.rulesName, ConvertRollToGold(g_round.currentStakes)))
+	ChatMsg(format(".:Greybeards Casino:. RULES: %s .:. STAKES << %s >>", g_app.rulesName, ConvertRollToGold(g_round.currentStakes)))
 	ChatMsg(format(".:GBC:. To enter: type %s", g_app.chatEnterMsg))
 
 	GBC_Btn_RoundNext:SetText("Announce Last Call")
+	GBC_StatusInfo_Update()
 end
 
 local function AnnounceLastCall()
-	ChatMsg(format(".:GBC:. Last Call to join! If you're a pussy, type %s", g_app.chatWithdrawMsg))
+	ChatMsg(format(".:GBC:. Last Call to join! To withdraw, type %s", g_app.chatWithdrawMsg))
 	GBC_Btn_RoundNext:SetText("Begin Rolling")
 end
 
@@ -120,17 +107,7 @@ local function AnnounceRolling()
 		g_round.acceptEntries = false 
 		g_round.acceptRolls = true  
 
-		if not (g_round.lowTieBreakActive and g_round.highTieBreakActive) then --(g_round.currentTie == 0) then 
-			ChatMsg(format(".:Greybeards Casino - /roll %s NOW:.", g_round.currentStakes))
-		end
-
-		if g_round.lowTieBreakActive then
-			ChatMsg(format("%s%d%s", "Low end tiebreaker! Roll 1-", g_round.currentStakes, " now!"))
-		end
-
-		if g_round.highTieBreakActive then
-			ChatMsg(format("%s%d%s", "High end tiebreaker! Roll 1-", g_round.currentStakes, " now!"));
-		end
+		ChatMsg(format(".:GBC - /roll %s NOW:.", g_round.currentStakes))
 	end
 
 	if g_round.acceptEntries and g_round.entrantsCount < 2 and not g_app.debug then
@@ -143,20 +120,9 @@ local function AnnounceRolling()
 end
 
 function RoundWrapup()
-	if table.getn(g_round.highTyers) <= 1 and table.getn(g_round.lowTyers) <= 1 then
-		ReportResults()
-		ResetRound()
-		ResetGBCFrames()
-		return
-	end
-
-	if table.getn(g_round.highTyers) > 1 then
-		HighTieBreaker()
-	end
-
-	if table.getn(g_round.lowTyers) > 1 then
-		LowTieBreaker()
-	end
+	ReportResults()
+	ResetRound()
+	ResetGBCFrames()
 end
 
 function ResetGBCFrames()
@@ -219,8 +185,8 @@ local function PrintStats(showAllStats)
 		end
 	end
 
-	DEFAULT_CHAT_FRAME:AddMessage("--- Greybeards Casino Stats ---", g_app.currentChatMethod)
-
+	--DEFAULT_CHAT_FRAME:AddMessage("--- Greybeards Casino Stats ---", g_app.currentChatMethod)
+	ChatMsg(".:Greybeards Casino Stats:.")
 	--if showAllStats then
 	--	for k = 0, #sortlistamount do
 	--		local sortsign = "won"
@@ -239,7 +205,9 @@ local function PrintStats(showAllStats)
 	for topIdx = 0, top do
 		sortsign = "won";
 		if(sortlistamount[topIdx] < 0) then sortsign = "lost"; end
-		ChatMsg(string.format("%d.  %s %s %s total", topIdx+1, sortlistname[topIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[topIdx]))), g_app.currentChatMethod);
+		if sortlistamount[topIdx] ~= 0 then 
+			ChatMsg(string.format("%d.  %s %s %s total", topIdx+1, sortlistname[topIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[topIdx]))), g_app.currentChatMethod);
+		end
 	end
 
 	if(top+1 < bottom) then
@@ -249,14 +217,16 @@ local function PrintStats(showAllStats)
 	for btmIdx = bottom, n-1 do
 		sortsign = "won";
 		if(sortlistamount[btmIdx] < 0) then sortsign = "lost"; end
-		ChatMsg(string.format("%d.  %s %s %s total", btmIdx+1, sortlistname[btmIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[btmIdx]))), g_app.currentChatMethod);
+		if sortlistamount[topIdx] ~= 0 then 
+			ChatMsg(string.format("%d.  %s %s %s total", btmIdx+1, sortlistname[btmIdx], sortsign, ConvertRollToGold(math.abs(sortlistamount[btmIdx]))), g_app.currentChatMethod);
+		end
 	end
 end
 
 --TODO soft code rule sets
 function PrintRules()
 	ChatMsg(format(".:GBC:. %s RULES:.", g_app.rulesName))
-	ChatMsg(".:Players will /roll STAKES:.")
+	ChatMsg(".:Players will /roll the STAKES:.")
 	ChatMsg(".:High roll wins. Low Roll loses. Loser pays out the roll difference:.")
 end
 
@@ -286,29 +256,52 @@ end
 
 function ResetStats()
 	g_app.sessionStats = {}
+	WriteMsg("", "", "|cffffff00GCG Stats have now been reset")
+end
+
+function PlayerStatsUpdate(name, value)
+	g_app.sessionStats[name] = (g_app.sessionStats[name] or 0) + value
 end
 
 function ReportResults()
 	local highRoll = GetCurrentHighRoll()
 	local lowRoll = GetCurrentLowRoll()
-	local goldowed = highRoll - lowRoll
-	if goldowed ~= 0 and (highRoll > 0 and lowRoll > 0) then
-		local lowName = g_round.lowName:gsub("^%l", string.upper)
-		local highName = g_round.highName:gsub("^%l", string.upper)
-		local msg = format("%s owes %s < %s >", g_round.lowName, g_round.highName, ConvertRollToGold(goldowed))
+	local goldOwed = highRoll - lowRoll
 
-		g_app.sessionStats[highName] = (g_app.sessionStats[highName] or 0) + goldowed
-		g_app.sessionStats[lowName] = (g_app.sessionStats[lowName] or 0) - goldowed
+	local splitCount = table.getn(g_round.lowTyers) + table.getn(g_round.highTyers) - 1
+	goldOwed = goldOwed / splitCount
 
-		ChatMsg(msg)
+	if goldOwed ~= 0 and (highRoll > 0 and lowRoll > 0) then
+		--TODO clean up this with a function to add amount to player stats
+		local lowNames = g_round.lowRoller
+		PlayerStatsUpdate(g_round.lowRoller, -goldOwed)
+		for idx=2, #g_round.lowTyers, 1 do
+			lowNames = lowNames..","..g_round.lowTyers[idx]
+			PlayerStatsUpdate(g_round.lowTyers[idx], -goldOwed)
+		end
+
+		local highNames = g_round.highRoller
+		PlayerStatsUpdate(g_round.highRoller, goldOwed)
+		for idx=2, #g_round.highTyers, 1 do
+			highNames = highNames..", "..g_round.highTyers[idx]
+			PlayerStatsUpdate(g_round.highTyers[idx], goldOwed)
+		end
+
+		local msg = format("%s owes %s < %s >", lowNames, highNames, ConvertRollToGold(goldOwed))
+		if splitCount > 1 then
+			msg = msg.." each."
+		end
+
+		ChatMsg(format(".:GBC Payouts:. %s", msg))
 	else
 		ChatMsg(".:GBC:. TIE! No payouts on this roll!")
 	end
 end
 
-function HighTieBreaker()
+function HighTieBreaker(rTyers)
 	local msgNames = ""
-	for roller in g_round.highTyers do
+	for idx=1 , #rTyers, 1 do
+		local roller =rTyers[idx]
 		msgNames = format("%s, %s", msgNames, roller)
 		g_round.entrants[roller].rolled = false
 		g_round.entrants[roller].roll = -1
@@ -319,9 +312,10 @@ function HighTieBreaker()
 	ChatMsg(format(".:GBC:. High Tiebreaker between: ", msgNames))
 end
 
-function LowTieBreaker()
+function LowTieBreaker(rTyers)
 	local msgNames = ""
-	for roller in g_round.lowTyers do
+	for idx=1, #rTyers, 1 do
+		local roller = rTyers[idx]
 		msgNames = format("%s, %s", msgNames, roller)
 		g_round.entrants[roller].rolled = false
 		g_round.entrants[roller].roll = -1
@@ -329,7 +323,7 @@ function LowTieBreaker()
 
 	g_round.lowTieBreakActive = true
 
-	ChatMsg(format(".:GBC:. Low Tiebreaker between: ", msgNames))
+	ChatMsg(format(".:GBC:. Low Tiebreaker between: %s. Roll again!", msgNames))
 end
 
 function ParseChatMsg(msg, username)
@@ -361,53 +355,19 @@ function ParseRoll(msg)
 	player.rolled = true
 	player.roll = roll
 
-	--High tie breaker
-	if g_round.highTieBreakActive and g_round.highTyers[playerName] then
-		if roll > GetCurrentHighTieHighRoll() then
-			g_round.highTieHighRoller = playerName
-			g_round.hightieHighTyers = { playerName }
-		elseif roll == GetCurrentHighTieHighRoll() then 
-			table.insert(g_round.hightieHighTyers, playerName)
-		end
-
-		if roll < GetCurrentHighTieLowRoll() then
-			g_round.highTieLowRoller = playerName
-			g_round.hightieLowTyers = { playerName }
-		elseif roll == GetCurrentHighTieLowRoll() then 
-			table.insert(g_round.hightieLowTyers, playerName)
-		end
-	--Low Tie breaker
-	elseif g_round.lowTieBreakActive and g_round.lowTyers[playerName] then
-		if roll > GetCurrentLowTieHighRoll() then
-			g_round.lowTieHighRoller = playerName
-			g_round.lowtieHighTyers = { playerName }
-		elseif roll == GetCurrentLowTieHighRoll() then 
-			table.insert(g_round.lowtieHighTyers, playerName)
-		end
-
-		if roll < GetCurrentLowTieLowRoll() then
-			g_round.lowTieLowRoller = playerName
-			g_round.lowtieLowTyers = { playerName }
-		elseif roll == GetCurrentLowTieLowRoll() then 
-			table.insert(g_round.lowtieLowTyers, playerName)
-		end
-	else
-	--Normal Roll
-		if roll > GetCurrentHighRoll() then
-			g_round.highRoller = playerName
-			g_round.highTyers = { playerName }
-		elseif roll == GetCurrentHighRoll() then 
-			table.insert(g_round.highTyers, playerName)
-		end
-
-		if roll < GetCurrentLowRoll() then
-			g_round.lowRoller = playerName
-			g_round.lowTyers = { playerName }
-		elseif roll == GetCurrentLowRoll() then 
-			table.insert(g_round.lowTyers, playerName)
-		end
+	if roll > GetCurrentHighRoll() then
+		g_round.highRoller = playerName
+		g_round.highTyers = { playerName }
+	elseif roll == GetCurrentHighRoll() then 
+		table.insert(g_round.highTyers, playerName)
 	end
 
+	if roll < GetCurrentLowRoll() then
+		g_round.lowRoller = playerName
+		g_round.lowTyers = { playerName }
+	elseif roll == GetCurrentLowRoll() then 
+		table.insert(g_round.lowTyers, playerName)
+	end
 
 	if GetRemainingToRollCount() == 0 then
 		RoundWrapup()
@@ -486,7 +446,6 @@ function AddPlayer(name)
 
 		g_round.entrants[charname] = entrantInfo
 		g_round.entrantsCount = g_round.entrantsCount + 1
-		g_round.totalRolls = g_round.totalRolls+1
 
 		DebugWrite(format("Added player: %s", charname))
 	else
@@ -608,17 +567,17 @@ function GBC_StatusInfo_Update()
 			local rollText = tostring(value.roll)
 			local btnFS = f:CreateFontString()
 			btnFS:SetFont(f:GetNormalFontObject():GetFont())	
-			btnFS:SetTextColor(1, 1, 1)
+			btnFS:SetTextColor(0.75, 0.75, 0.75)
 
 			--TODO soft code these colors
 			--ENTERED
 			if tonumber(value.roll) <= 0 then
-				rollText = "-"
+				rollText = "---"
 				btnFS:SetTextColor(0.91, 0.88, 0.08) 
 			else
-				if value.name == g_round.highRoller then
+				if has_value(g_round.highTyers, value.name) then
 					btnFS:SetTextColor(0.2, 1, 0.2)
-				elseif value.name == g_round.lowRoller then
+				elseif has_value(g_round.lowTyers, value.name) then
 					btnFS:SetTextColor(1, 0.2, 0.2)
 				end
 			end
@@ -650,7 +609,37 @@ function ChatMsg(msg, chatType, language, channel)
 	SendChatMessage(msg, chatType, language, channelnum)
 end
 
-function DebugMode(enable)
+--TODO wrap these debug args in an object
+function DebugMode(args)
+	if args == nil or #args == 0 or args[0] ~= "debug" then
+		return
+	end
+
+	if args[1] == "enable" then
+		SetDebugMode(true)
+		return
+	elseif args[1] == "disable" then
+		SetDebugMode(false)
+		return
+	end
+
+	if not g_app.debug then
+		return
+	end
+
+	if args[1] == "roll" then
+		fakemsg = format("%s rolls %s (1-%s)", args[2], args[3], g_round.currentStakes)
+		ParseRoll(fakemsg)
+	elseif args[1] == "enter" then
+		ParseChatMsg("1", args[2])
+	elseif args[1] == "withdraw" then
+		ParseChatMsg("-1", args[2])
+	else
+		WriteMsg("", "", "|cffffff00Invalid argument for command /gbc debug")
+	end
+end
+
+function SetDebugMode(enable)
 	msg = "enabled"
 	if not enable then
 		msg = "disabled"
@@ -816,6 +805,11 @@ local g_cmds = {
 		func = GBC_Reset,
 		description = "Reset the current round."
 	},
+	next = {
+		cmd = "next",
+		func = NextPhase,
+		description = "Go to next phase of game round."
+	},
 	debug = {
 		cmd = "debug",
 		func = DebugMode,
@@ -835,9 +829,18 @@ function GBC_SlashCmd(msg)
 		for key,value in pairs(g_cmds) do
 			WriteMsg("","", format("%s - %s", value.cmd, value.description))
 		end
+	end
 
-	elseif g_cmds[msg] ~= nil then
-		g_cmds[msg].func()
+	--split string
+	args = {} 
+	idx = 0
+	for arg in string.gmatch(msg, "([^".." ".."]+)") do
+		args[idx] = arg
+		idx = idx + 1
+	end
+
+	if g_cmds[args[0]] ~= nil then
+		g_cmds[args[0]].func(args)
 	else
 		WriteMsg("", "", "|cffffff00Invalid argument for command /gbc")
 	end

@@ -2,17 +2,18 @@
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
 	xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="GreybeardsCasino.lua" />
-
+<!-- TEMPLATES  -->
 	<Button name="GBC_StatusEntry_Template" virtual="true">
 	   <Size>
 	     <AbsDimension x="75" y="12"/>
 	   </Size>
 	   <NormalFont style="GameFontHighlightLeft"/>
 	</Button> <!-- GBC_StatusEntry_Template -->
-
 	<Font name="GBCFont" inherits="GameFontNormal" virtual="true">
   	</Font> <!--GBCFont-->
-
+  	<Font name="GBCFont_Banner" inherits="GameFontNormal" virtual="true">
+  	</Font> <!--GBCFont_Banner-->
+<!-- FRAMES -->
 	<Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true">
 		<Scripts>
 			<OnLoad>
@@ -50,7 +51,7 @@
 				</Scripts>
 			</Button> <!-- GBC_CloseWindow -->
 			<Frame name="GBC_Header">
-				<Size y="60"/>
+				<Size y="90"/>
 				<Anchors >
 					<Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
@@ -60,8 +61,13 @@
 				</Backdrop>
 				<Layers>
 					<Layer level="OVERLAY">
-						<FontString inherits="GBCFont" text="Greybeards Casino">
+						<FontString name="BannerFS" inherits="GBCFont_Banner" text="Greybeards Casino">
+							<Color r="1" g="1" b="1" a="1"/>
 							<FontHeight val="60"/>
+							<Shadow>
+							    <Offset x="1" y="1" />
+							    <Color r="0" g="0" b="0"/>
+						  	</Shadow>
 							<Anchors>
 								<Anchor relativeTo="GBC_Header" relativePoint="CENTER" point="CENTER"/>
 							</Anchors>
@@ -70,7 +76,7 @@
 				</Layers>
 			</Frame><!-- GBC_Header -->
 			<Frame name="GBC_Panel_Upper">
-				<Size y="168"/>
+				<Size y="146"/>
 				<Anchors>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
@@ -171,18 +177,6 @@
 									</OnClick>
 								</Scripts>
 							</Button> <!--GBC_Btn_StatsReset-->
-							<Button name="GBC_Btn_RoundReset" inherits="OptionsButtonTemplate" text="Reset Round">
-								<Size y="26"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Btn_StatsReset" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Btn_StatsReset" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnClick>
-										GBC_Btn_RoundReset_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!-- GBC_Btn_RoundReset -->
 						</Frames>
 					</Frame> <!--GBC_Admin-->
 				</Frames>
@@ -316,6 +310,18 @@
 											</OnClick>
 										</Scripts>
 									</Button> <!-- GBC_Btn_ListRemaining -->
+									<Button name="GBC_Btn_RoundReset" inherits="OptionsButtonTemplate" text="Reset Round">
+										<Size y="26"/>
+										<Anchors>
+											<Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												GBC_Btn_RoundReset_OnClick()
+											</OnClick>
+										</Scripts>
+									</Button> <!-- GBC_Btn_RoundReset -->
 									<Frame name="GBC_Frame_Phases">
 										<Anchors>
 											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
