@@ -347,7 +347,7 @@ function ParseRoll(msg)
 	maxRoll = tonumber(strsub(maxRoll,1,-2))
 	roll = tonumber(roll)
 	
-	if minRoll ~= 1 or maxRoll ~= g_round.currentStakes and (roll > maxRoll or roll < minRoll) then 
+	if minRoll ~= 1 or maxRoll ~= g_round.currentStakes or roll > maxRoll or roll < minRoll then 
 		DebugWrite("Invalid roll parsed!")
 		return
 	end
