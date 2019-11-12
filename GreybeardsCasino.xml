@@ -92,48 +92,70 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
 						<Frames>
-							<Frame name="GBC_Ruleset_Banner">
-								<Size y="40"/>
+							<Frame name="GBC_Ruleset_Container">
 								<Anchors>
-									<Anchor relativeTo="GBC_GameModes" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_GameModes" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_GameModes" point="TOPLEFT">
+										<Offset x="16" y="-16"/>
+									</Anchor>
+									<Anchor relativeTo="GBC_GameModes" point="BOTTOMLEFT">
+										<Offset x="16" y="16"/>
+									</Anchor>
+									<Anchor relativeTo="GBC_GameModes" point="BOTTOMRIGHT">
+										<Offset x="-16" y="16"/>
+									</Anchor>
+									<Anchor relativeTo="GBC_GameModes" point="TOPRIGHT">
+										<Offset x="-16" y="-16"/>
+									</Anchor>
 								</Anchors>
-								<Layers>
-									<Layer level="OVERLAY">
-										<FontString inherits="GBCFont" text="THE RULES">
-											<Anchors>
-												<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="CENTER" point="CENTER"/>
-											</Anchors>
-										</FontString>
-									</Layer>
-								</Layers>
-							</Frame><!--GBC_Ruleset_Banner-->
-							<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
-								<Size y="26"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnClick>
-										GBC_Btn_RulesDisplay_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_RulesDisplay-->
-							<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
-								<Anchors>
-									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnLoad>
-										UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
-									</OnLoad>
-									<OnClick>
-										GBC_Btn_ChatBroadcast_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_ChatBroadcast -->
+								<Frames>
+									<Frame name="GBC_Ruleset_Banner">
+										<Size y="40"/>
+										<Anchors>
+											<Anchor relativeTo="GBC_Ruleset_Container" point="TOPLEFT"/>
+											<Anchor relativeTo="GBC_Ruleset_Container" point="TOPRIGHT"/>
+										</Anchors>
+										<Layers>
+											<Layer level="OVERLAY">
+												<FontString inherits="GBCFont" text="THE RULES">
+													<Anchors>
+														<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="CENTER" point="CENTER"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+									</Frame><!--GBC_Ruleset_Banner-->
+									<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
+										<Size y="26"/>
+										<Anchors>
+											<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+										</Anchors>
+										<Scripts>
+											<OnClick>
+												GBC_Btn_RulesDisplay_OnClick()
+											</OnClick>
+										</Scripts>
+									</Button> <!--GBC_Btn_RulesDisplay-->
+									<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
+										<Anchors>
+											<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+												<Offset x="-16"/>
+											</Anchor>
+											<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+												<Offset x="-16"/>
+											</Anchor>
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
+											</OnLoad>
+											<OnClick>
+												GBC_Btn_ChatBroadcast_OnClick()
+											</OnClick>
+										</Scripts>
+									</Button> <!--GBC_Btn_ChatBroadcast -->
+								</Frames>
+							</Frame> <!--GBC_Ruleset_Container-->
 						</Frames>
 					</Frame> <!-- GBC_GameModes -->
 					<Frame name="GBC_Admin">
@@ -155,8 +177,8 @@
 							<Frame name="GBC_Stats_Banner">
 								<Size y="40"/>
 								<Anchors>
-									<Anchor relativeTo="GBC_Admin" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Admin" relativePoint="TOPLEFT" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Admin" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Admin" point="TOPRIGHT"/>
 								</Anchors>
 								<Layers>
 									<Layer level="OVERLAY">

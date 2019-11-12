@@ -2,7 +2,7 @@
 --Author: Looch
 
 local g_app = {
-	debug = false,
+	debug = true,
 	showing = true,
 	customChannel = "GreybeardsCasino",
 	chatEnterMsg = "1",
@@ -753,8 +753,8 @@ function GBC_Btn_ChatBroadcast_OnLoad()
 		end 
 	end 
 
-	UIDropDownMenu_SetWidth(GBC_Btn_ChatBroadcast, GBC_Admin:GetWidth()-40, 0)
-	UIDropDownMenu_JustifyText(GBC_Btn_ChatBroadcast, "LEFT")
+	UIDropDownMenu_SetWidth(GBC_Btn_ChatBroadcast, GBC_Ruleset_Container:GetWidth()-20, 0)
+	UIDropDownMenu_JustifyText(GBC_Btn_ChatBroadcast, "CENTER")
 end
 
 function GBC_Btn_RulesDisplay_OnClick()
