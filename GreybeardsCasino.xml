@@ -91,25 +91,50 @@
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
-						<Layers>
-							<Layer level="OVERLAY">
-								<FontString inherits="GBCFont" text="THE RULES">
-									<FontHeight>
-							      		<AbsValue val="60"/>
-								    </FontHeight>
-									<Anchors>
-										<Anchor relativeTo="GBC_GameModes" relativePoint="TOP" point="TOP">
-											<Offset y="-26"/>
-										</Anchor>
-									</Anchors>
-								</FontString>
-								<FontString inherits="GBCFont" text="Hi/Lo">
-									<Anchors>
-										<Anchor relativeTo="GBC_GameModes" relativePoint="CENTER" point="CENTER"/>
-									</Anchors>
-								</FontString>
-							</Layer>
-						</Layers>
+						<Frames>
+							<Frame name="GBC_Ruleset_Banner">
+								<Size y="40"/>
+								<Anchors>
+									<Anchor relativeTo="GBC_GameModes" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_GameModes" point="TOPLEFT"/>
+								</Anchors>
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString inherits="GBCFont" text="THE RULES">
+											<Anchors>
+												<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="CENTER" point="CENTER"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame><!--GBC_Ruleset_Banner-->
+							<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
+								<Size y="26"/>
+								<Anchors>
+									<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnClick>
+										GBC_Btn_RulesDisplay_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button> <!--GBC_Btn_RulesDisplay-->
+							<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
+								<Anchors>
+									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
+									</OnLoad>
+									<OnClick>
+										GBC_Btn_ChatBroadcast_OnClick()
+									</OnClick>
+								</Scripts>
+							</Button> <!--GBC_Btn_ChatBroadcast -->
+						</Frames>
 					</Frame> <!-- GBC_GameModes -->
 					<Frame name="GBC_Admin">
 						<Anchors>
@@ -127,37 +152,27 @@
 							</Anchor>
 						</Anchors>
 						<Frames>
-							<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
+							<Frame name="GBC_Stats_Banner">
+								<Size y="40"/>
 								<Anchors>
 									<Anchor relativeTo="GBC_Admin" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 									<Anchor relativeTo="GBC_Admin" relativePoint="TOPLEFT" point="TOPLEFT"/>
 								</Anchors>
-								<Scripts>
-									<OnLoad>
-										UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
-									</OnLoad>
-									<OnClick>
-										GBC_Btn_ChatBroadcast_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_ChatBroadcast -->
-							<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
-								<Size y="26"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Btn_ChatBroadcast" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnClick>
-										GBC_Btn_RulesDisplay_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_RulesDisplay-->
+								<Layers>
+									<Layer level="OVERLAY">
+										<FontString inherits="GBCFont" text="THE STATS">
+											<Anchors>
+												<Anchor relativeTo="GBC_Stats_Banner" relativePoint="CENTER" point="CENTER"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame><!--GBC_Stats_Banner-->
 							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Broadcast Stats">
 								<Size y="26"/>
 								<Anchors>
-									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+									<Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+									<Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 								</Anchors>
 								<Scripts>
 									<OnClick>
