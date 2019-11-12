@@ -29,7 +29,7 @@
   				self:StopMovingOrSizing()
   			</OnDragStop>
 		</Scripts>
-		<Size x="450" y="500"/>
+		<Size x="450" y="535"/>
 		<Absposition x="100" y="100"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
@@ -359,14 +359,54 @@
 											</OnClick>
 										</Scripts>
 									</Button> <!-- GBC_Btn_RoundReset -->
-									<Frame name="GBC_Frame_Phases">
+									<Frame name="GBC_PersonalContols_Panel">
 										<Anchors>
-											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+											<Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+												<Offset y="-10"/>
+											</Anchor>
+											<Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+												<Offset y="-10"/>
+											</Anchor>
 											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 										</Anchors>
-									</Frame><!--GBC_Frame_Phases-->
+										<Frames>
+											<Frame name="GBC_PersonalControls_Banner">
+												<Size y="24"/>
+												<Anchors>
+													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPLEFT" point="TOPLEFT"/>
+													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+												</Anchors>
+												<Layers>
+													<Layer level="OVERLAY">
+														<FontString inherits="GBCFont" text="Personal Controls" justifyH="CENTER"/>
+													</Layer>
+												</Layers>
+											</Frame><!--GBC_PersonalControls_Banner-->
+											<Button name="GBC_Btn_PersonalEnter" inherits="OptionsButtonTemplate" text="Enter">
+												<Anchors>
+													<Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														GBC_Btn_PersonalEnter_OnClick()
+													</OnClick>
+												</Scripts>
+											</Button> <!-- GBC_Btn_RoundReset -->
+											<Button name="GBC_Btn_PersonalRoll" inherits="OptionsButtonTemplate" text="Roll">
+												<Anchors>
+													<Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+													<Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+													<Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+												</Anchors>
+												<Scripts>
+													<OnClick>
+														GBC_Btn_PersonalRoll_OnClick()
+													</OnClick>
+												</Scripts>
+											</Button> <!-- GBC_Btn_RoundReset -->
+										</Frames>
+									</Frame><!--GBC_PersonalContols_Panel-->
 								</Frames>
 							</Frame> <!-- GBC_RoundControls_Container -->
 						</Frames>
