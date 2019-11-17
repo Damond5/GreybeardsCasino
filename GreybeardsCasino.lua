@@ -2,7 +2,7 @@
 --Author: Looch
 
 local g_app = {
-	debug = true,
+	debug = false,
 	showing = true,
 	customChannel = "GreybeardsCasino",
 	chatEnterMsg = "1",
