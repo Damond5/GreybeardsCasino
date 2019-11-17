@@ -17,12 +17,14 @@ local g_app = {
 	currentChatMethod = "SAY",
 	savedStakes = 100,
 	showMinimap = false,
+	squareMinimap = false,
 	acceptedEntriesFrame = nil,
 	sessionStats = {},
 	minimapPosition = 75,
 	rulesName = "Hi/Lo",
 	version = "1.1.0", --TODO pull this from .toc
-	banList = {}
+	banList = {},
+	minimap = { hide = false, },
 }
 
 local g_roundDefaults = {
@@ -92,6 +94,7 @@ local function StartRound()
 	ChatMsg(format(".:GBC:. To enter: type %s", g_app.chatEnterMsg))
 
 	GBC_Btn_RoundNext:SetText("Announce Last Call")
+	GBC_Btn_PersonalEnter:Enable()
 	GBC_StatusInfo_Update()
 end
 
@@ -116,7 +119,9 @@ local function AnnounceRolling()
 
 	GBC_Btn_RoundNext:Disable()
 	GBC_Btn_RoundNext:SetText("Waiting for rolls...")
-	GBC_Btn_ListRemaining_Update();
+	GBC_Btn_PersonalRoll:Enable()
+	GBC_Btn_PersonalEnter:Disable()
+	GBC_Btn_ListRemaining_Update()
 end
 
 function RoundWrapup()
@@ -130,6 +135,8 @@ function ResetGBCFrames()
 	GBC_Btn_RoundNext:SetText("Start Round")
 	GBC_Btn_RoundNext:Enable()
 	GBC_Btn_ListRemaining:Disable()
+	GBC_Btn_PersonalRoll:Disable()
+	GBC_Btn_PersonalEnter:Disable()
 
 	GBC_StatusInfo_Update()
 end
@@ -671,7 +678,7 @@ function GBC_OnLoad(self)
     
 	ResetGBCFrames()
 
-	--DEFAULT to not show
+	--DEFAULT hide
 	if not g_app.debug then
 		ToggleRootFrame()
 	end
@@ -753,8 +760,8 @@ function GBC_Btn_ChatBroadcast_OnLoad()
 		end 
 	end 
 
-	UIDropDownMenu_SetWidth(GBC_Btn_ChatBroadcast, GBC_Admin:GetWidth()-40, 0)
-	UIDropDownMenu_JustifyText(GBC_Btn_ChatBroadcast, "LEFT")
+	UIDropDownMenu_SetWidth(GBC_Btn_ChatBroadcast, GBC_Ruleset_Container:GetWidth()-20, 0)
+	UIDropDownMenu_JustifyText(GBC_Btn_ChatBroadcast, "CENTER")
 end
 
 function GBC_Btn_RulesDisplay_OnClick()
@@ -779,6 +786,16 @@ end
 
 function GBC_Btn_RoundReset_OnClick()
 	ResetRound()
+end
+
+function GBC_Btn_PersonalEnter_OnClick()
+	ChatMsg(g_app.chatEnterMsg)
+	GBC_Btn_PersonalEnter:Disable()
+end
+
+function GBC_Btn_PersonalRoll_OnClick()
+	hash_SlashCmdList[SLASH_RANDOM1:upper()](g_round.currentStakes)
+	GBC_Btn_PersonalRoll:Disable()
 end
 
 function GetVersionString()
@@ -852,6 +869,10 @@ SlashCmdList["GBC"] = GBC_SlashCmd
 
 --MINIMAP BUTTON
 function GBC_MinimapBtn_DraggingFrame_OnUpdate()
+	minimap_old()
+end
+
+function minimap_old()
 	local xpos,ypos = GetCursorPosition()
 	local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
 
@@ -859,6 +880,8 @@ function GBC_MinimapBtn_DraggingFrame_OnUpdate()
 	ypos = ypos/UIParent:GetScale()-ymin-70
 
 	local minimapPos = math.deg(math.atan2(ypos,xpos))
+
+
 	local xoffset = 52 - ( 80 * cos(minimapPos))
 	local yoffset = (80 * sin(minimapPos)) - 52
 	GBC_MinimapBtn:SetPoint("TOPLEFT","Minimap","TOPLEFT", xoffset, yoffset)
