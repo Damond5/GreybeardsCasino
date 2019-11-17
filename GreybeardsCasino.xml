@@ -384,8 +384,10 @@
 												</Layers>
 											</Frame><!--GBC_PersonalControls_Banner-->
 											<Button name="GBC_Btn_PersonalEnter" inherits="OptionsButtonTemplate" text="Enter">
+												<Size x="96"/>
 												<Anchors>
 													<Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 												</Anchors>
 												<Scripts>
 													<OnClick>
