@@ -1,7 +1,7 @@
 <Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
 	xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="GreybeardsCasino.lua" />
+	<Script file="RollCasino.lua" />
 <!-- TEMPLATES  -->
 	<Button name="GBC_StatusEntry_Template" virtual="true">
 	   <Size>
@@ -61,7 +61,7 @@
 				</Backdrop>
 				<Layers>
 					<Layer level="OVERLAY">
-						<FontString name="BannerFS" inherits="GBCFont_Banner" text="Greybeards Casino">
+						<FontString name="BannerFS" inherits="GBCFont_Banner" text="Roll Casino">
 							<Color r="1" g="1" b="1" a="1"/>
 							<FontHeight val="60"/>
 							<Shadow>
@@ -578,7 +578,7 @@
 		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
 		<Layers>
 			<Layer level="OVERLAY" textureSubLevel="1">
-				<Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\GreybeardsCasino\media\icon">
+				<Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\RollCasino\media\icon">
 					<Size x="18" y="18"/>
 					<Anchors>
 						<Anchor point="TOPLEFT">

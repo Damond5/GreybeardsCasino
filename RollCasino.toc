@@ -1,11 +1,11 @@
 ## Interface: 32089
-## Title:|cFFFF7F7FG|cFFFFC47Fr|cFFFFFF7Fe|cFF7FFF7Fy|cFF7F7FFFb|cFFFF7FFFe|cFFFF7F7Fa|cFFFFC47Fr|cFFFFFF7Fd|cFF7FFF7Fs |cFF7F7FFFC|cFFFF7FFFa|cFFFF7F7Fs|cFFFFC47Fi|cFFFFFF7Fn|cFF7FFF7Fo
+## Title:|cFFFF7F7FR|cFFFFC47Fo|cFFFFFF7Fl|cFF7FFF7Fl|cFF7F7FFFC|cFFFF7FFFa|cFFFF7F7Fs|cFFFFC47Fi|cFFFFFF7Fn|cFF7FFF7Fo
 ## Author: Looch
 ## 1.13.2 Maintainer: Looch <The Greybeards> - Heartseeker
 ## Version: 1.2.1
 ## DefaultState: Disabled
 ## LoadOnDemand: 0
 ## Notes: Role play as a degenerate gambler.
-## SavedVariables: GreybeardsCasino
+## SavedVariables: RollCasino
 
-GreybeardsCasino.xml
+RollCasino.xml

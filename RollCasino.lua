@@ -1,10 +1,10 @@
---Greybeards Casino
+--Roll Casino
 --Author: Looch
 
 local g_app = {
 	debug = false,
 	showing = true,
-	customChannel = "GreybeardsGamble",
+	customChannel = "RollGamble",
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
 	chatMethods = {
@@ -90,8 +90,8 @@ local function GBC_StartRound()
 	g_round.acceptEntries = true
 	g_round.currentStakes = g_app.savedStakes
 
-	ChatMsg(format(".:Greybeards Casino:. RULES: %s .:. STAKES << %s >>", g_app.rulesName, ConvertRollToGold(g_round.currentStakes)))
-	ChatMsg(format(".:GBC:. To enter: type %s", g_app.chatEnterMsg))
+	ChatMsg(format(".:Roll Casino:. RULES: %s .:. STAKES << %s >>", g_app.rulesName, ConvertRollToGold(g_round.currentStakes)))
+	ChatMsg(format(".:RC:. To enter: type %s", g_app.chatEnterMsg))
 
 	GBC_Btn_RoundNext:SetText("Announce Last Call")
 	GBC_Btn_PersonalEnter:Enable()
@@ -99,7 +99,7 @@ local function GBC_StartRound()
 end
 
 local function AnnounceLastCall()
-	ChatMsg(format(".:GBC:. Last Call to join! To withdraw, type %s", g_app.chatWithdrawMsg))
+	ChatMsg(format(".:RC:. Last Call to join! To withdraw, type %s", g_app.chatWithdrawMsg))
 	GBC_Btn_RoundNext:SetText("Begin Rolling")
 end
 
@@ -110,7 +110,7 @@ local function AnnounceRolling()
 		g_round.acceptEntries = false 
 		g_round.acceptRolls = true  
 
-		ChatMsg(format(".:GBC - /roll %s NOW:.", g_round.currentStakes))
+		ChatMsg(format(".:RC - /roll %s NOW:.", g_round.currentStakes))
 	end
 
 	if g_round.acceptEntries and g_round.entrantsCount < 2 and not g_app.debug then
@@ -179,7 +179,7 @@ local function GBC_PrintStats(showAllStats)
 	end
 
 	if(n == 0) then
-		DEFAULT_CHAT_FRAME:AddMessage(".:GBC:. No stats recorded yet.")
+		DEFAULT_CHAT_FRAME:AddMessage(".:RC:. No stats recorded yet.")
 		return
 	end
 
@@ -192,16 +192,7 @@ local function GBC_PrintStats(showAllStats)
 		end
 	end
 
-	--DEFAULT_CHAT_FRAME:AddMessage("--- Greybeards Casino Stats ---", g_app.currentChatMethod)
-	ChatMsg(".:Greybeards Casino Stats:.")
-	--if showAllStats then
-	--	for k = 0, #sortlistamount do
-	--		local sortsign = "won"
-	--		if(sortlistamount[k] < 0) then sortsign = "lost" end
-	--		ChatMsg(string.format("%d.  %s %s %d total", k+1, sortlistname[k], sortsign, math.abs(sortlistamount[k])), g_app.currentChatMethod)
-	--	end
-	--	return
-	--end
+	ChatMsg(".:RollCasino Stats:.")
 
 	local top = 2;
 	local bottom = n-3;
@@ -232,7 +223,7 @@ end
 
 --TODO soft code rule sets
 function PrintRules()
-	ChatMsg(format(".:GBC:. %s RULES:.", g_app.rulesName))
+	ChatMsg(format(".:RC:. %s RULES:.", g_app.rulesName))
 	ChatMsg(".:Players will /roll the STAKES:.")
 	ChatMsg(".:High roll wins. Low Roll loses. Loser pays out the roll difference:.")
 end
@@ -299,9 +290,9 @@ function GBC_ReportResults()
 			msg = msg.." each."
 		end
 
-		ChatMsg(format(".:GBC Payouts:. %s", msg))
+		ChatMsg(format(".:RC Payouts:. %s", msg))
 	else
-		ChatMsg(".:GBC:. TIE! No payouts on this roll!")
+		ChatMsg(".:RC:. TIE! No payouts on this roll!")
 	end
 end
 
@@ -316,7 +307,7 @@ function HighTieBreaker(rTyers)
 
 	g_round.highTieBreakActive = true
 
-	ChatMsg(format(".:GBC:. High Tiebreaker between: ", msgNames))
+	ChatMsg(format(".:RC:. High Tiebreaker between: ", msgNames))
 end
 
 function LowTieBreaker(rTyers)
@@ -330,7 +321,7 @@ function LowTieBreaker(rTyers)
 
 	g_round.lowTieBreakActive = true
 
-	ChatMsg(format(".:GBC:. Low Tiebreaker between: %s. Roll again!", msgNames))
+	ChatMsg(format(".:RC:. Low Tiebreaker between: %s. Roll again!", msgNames))
 end
 
 function ParseChatMsg(msg, username)
@@ -663,7 +654,7 @@ end
 
 -- LOAD FUNCTION --
 function GBC_OnLoad(self)
-	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Greybeards Casino> loaded. Type /gbc to display available commands.")
+	DEFAULT_CHAT_FRAME:AddMessage("|cffffff00<Roll Casino> loaded. Type /gbc to display available commands.")
 
 	self:RegisterEvent("CHAT_MSG_RAID")
 	self:RegisterEvent("CHAT_MSG_CHANNEL")
@@ -803,7 +794,7 @@ function GBC_GetVersionString()
 end
 
 function GBC_DisplayVersion()
-	WriteMsg("","", format("GreybeardsCasino v%s", GBC_GetVersionString()))
+	WriteMsg("","", format("RollCasino v%s", GBC_GetVersionString()))
 end
 
 local g_cmds = {
@@ -841,7 +832,7 @@ local g_cmds = {
 
 function GBC_SlashCmd(msg)
 	if (msg == "" or msg == nil) then
-		WriteMsg("", "", "~Following commands for GreybeardsCasino~")
+		WriteMsg("", "", "~Following commands for RollCasino~")
 
 		for key,value in pairs(g_cmds) do
 			WriteMsg("","", format("%s - %s", value.cmd, value.description))
