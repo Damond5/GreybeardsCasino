@@ -4,7 +4,7 @@
 local g_app = {
 	debug = false,
 	showing = true,
-	customChannel = "GreybeardsCasino",
+	customChannel = "GreybeardsGamble",
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
 	chatMethods = {
@@ -22,7 +22,7 @@ local g_app = {
 	sessionStats = {},
 	minimapPosition = 75,
 	rulesName = "Hi/Lo",
-	version = "1.1.0", --TODO pull this from .toc
+	version = "1.2.1", --TODO pull this from .toc
 	banList = {},
 	minimap = { hide = false, },
 }
@@ -66,7 +66,7 @@ local function ConvertRollToGold(value)
 end
 
 --TODO find a way to deep copy round defaults
-local function ResetRound()
+local function GBC_ResetRound()
 	g_round = g_roundDefaults
 	g_round.currentPhase = 0
 	g_round.entrantsCount = 0
@@ -77,12 +77,12 @@ local function ResetRound()
 	WriteMsg("", "", "|cffffff00GCG Round has now been reset")
 end
 
-local function StartRound()
+local function GBC_StartRound()
 	--Grab current stakes before resetting round defaults
 	g_app.savedStakes = tonumber(GBC_EditBox_Stakes:GetText())
 	GBC_EditBox_Stakes:ClearFocus()
 
-	ResetRound()
+	GBC_ResetRound()
 
 	g_round.entrants = {}
 	g_round.highRoller = nil
@@ -124,9 +124,9 @@ local function AnnounceRolling()
 	GBC_Btn_ListRemaining_Update()
 end
 
-function RoundWrapup()
-	ReportResults()
-	ResetRound()
+function GBC_RoundWrapup()
+	GBC_ReportResults()
+	GBC_ResetRound()
 	ResetGBCFrames()
 end
 
@@ -142,9 +142,9 @@ function ResetGBCFrames()
 end
 
 --TODO soft code this for different rule sets
-local function NextPhase()
+local function GBC_NextPhase()
 	if g_round.currentPhase == 0 then
-		StartRound()
+		GBC_StartRound()
 	elseif g_round.currentPhase == 1 then
 		AnnounceLastCall()
 	elseif g_round.currentPhase == 2 then
@@ -155,7 +155,7 @@ local function NextPhase()
 end
 
 --TODO massively rework this
-local function PrintStats(showAllStats)
+local function GBC_PrintStats(showAllStats)
 	local sortlistname = {}
 	local sortlistamount = {}
 	local n = 0
@@ -237,7 +237,7 @@ function PrintRules()
 	ChatMsg(".:High roll wins. Low Roll loses. Loser pays out the roll difference:.")
 end
 
-local function ToggleRootFrame()
+local function GBC_ToggleRootFrame()
 	g_app.showing = not g_app.showing
 	
 	if g_app.showing then
@@ -247,12 +247,12 @@ local function ToggleRootFrame()
 	end
 end
 
-function ShowRootFrame()
+function GBC_ShowRootFrame()
 	g_app.showing = true
 	GBC_Root:Show()
 end
 
-function CloseRootFrame()
+function GBC_CloseRootFrame()
 	g_app.showing = false
 	GBC_Root:Hide()
 end
@@ -261,7 +261,7 @@ function ChangeChannel(channel)
 	g_app.customChannel = channel
 end
 
-function ResetStats()
+function GBC_ResetStats()
 	g_app.sessionStats = {}
 	WriteMsg("", "", "|cffffff00GCG Stats have now been reset")
 end
@@ -270,7 +270,7 @@ function PlayerStatsUpdate(name, value)
 	g_app.sessionStats[name] = (g_app.sessionStats[name] or 0) + value
 end
 
-function ReportResults()
+function GBC_ReportResults()
 	local highRoll = GetCurrentHighRoll()
 	local lowRoll = GetCurrentLowRoll()
 	local goldOwed = highRoll - lowRoll
@@ -377,7 +377,7 @@ function ParseRoll(msg)
 	end
 
 	if GetRemainingToRollCount() == 0 then
-		RoundWrapup()
+		GBC_RoundWrapup()
 	end
 	
 	GBC_StatusInfo_Update()
@@ -507,7 +507,7 @@ end
 function GetRemainingToRollCount()
 	remainCount = 0
 	for key,value in pairs(g_round.entrants) do
-		if not value.rolled then
+		if value.entered and not value.rolled then
 			remainCount = remainCount + 1
 		end
 	end
@@ -617,16 +617,16 @@ function ChatMsg(msg, chatType, language, channel)
 end
 
 --TODO wrap these debug args in an object
-function DebugMode(args)
+function GBC_DebugMode(args)
 	if args == nil or #args == 0 or args[0] ~= "debug" then
 		return
 	end
 
 	if args[1] == "enable" then
-		SetDebugMode(true)
+		GBC_SetDebugMode(true)
 		return
 	elseif args[1] == "disable" then
-		SetDebugMode(false)
+		GBC_SetDebugMode(false)
 		return
 	end
 
@@ -646,7 +646,7 @@ function DebugMode(args)
 	end
 end
 
-function SetDebugMode(enable)
+function GBC_SetDebugMode(enable)
 	msg = "enabled"
 	if not enable then
 		msg = "disabled"
@@ -680,7 +680,7 @@ function GBC_OnLoad(self)
 
 	--DEFAULT hide
 	if not g_app.debug then
-		ToggleRootFrame()
+		GBC_ToggleRootFrame()
 	end
 end
 
@@ -730,7 +730,7 @@ function GBC_EditBox_Stakes_OnEnterPressed()
 end
 
 function GBC_CloseFrame()
-	CloseRootFrame()
+	GBC_CloseRootFrame()
 end
 
 local function CreateChatMethodText(chatMethod)
@@ -769,15 +769,15 @@ function GBC_Btn_RulesDisplay_OnClick()
 end
 
 function GBC_Btn_StatsDisplay_OnClick()
-	PrintStats(false)
+	GBC_PrintStats(false)
 end
 
 function GBC_Btn_StatsReset_OnClick()
-	ResetStats()
+	GBC_ResetStats()
 end
 
 function GBC_Btn_RoundNext_OnClick()
-	NextPhase()
+	GBC_NextPhase()
 end
 
 function GBC_Btn_ListRemaining_OnClick()
@@ -785,7 +785,7 @@ function GBC_Btn_ListRemaining_OnClick()
 end
 
 function GBC_Btn_RoundReset_OnClick()
-	ResetRound()
+	GBC_ResetRound()
 end
 
 function GBC_Btn_PersonalEnter_OnClick()
@@ -798,23 +798,23 @@ function GBC_Btn_PersonalRoll_OnClick()
 	GBC_Btn_PersonalRoll:Disable()
 end
 
-function GetVersionString()
+function GBC_GetVersionString()
 	return g_app.version
 end
 
-function DisplayVersion()
-	WriteMsg("","", format("GreybeardsCasino v%s", GetVersionString()))
+function GBC_DisplayVersion()
+	WriteMsg("","", format("GreybeardsCasino v%s", GBC_GetVersionString()))
 end
 
 local g_cmds = {
 	show = {
 		cmd = "show",
-		func = ShowRootFrame,
+		func = GBC_ShowRootFrame,
 		description = "Shows the main window."
 	},
 	hide = {
 		cmd = "hide",
-		func = CloseRootFrame,
+		func = GBC_CloseRootFrame,
 		description = "Hides the main window."
 	},
 	reset = {
@@ -824,17 +824,17 @@ local g_cmds = {
 	},
 	next = {
 		cmd = "next",
-		func = NextPhase,
+		func = GBC_NextPhase,
 		description = "Go to next phase of game round."
 	},
 	debug = {
 		cmd = "debug",
-		func = DebugMode,
+		func = GBC_DebugMode,
 		description = "Debug mode { on | off }"
 	},
 	version = {
 		cmd = "version",
-		func = DisplayVersion,
+		func = GBC_DisplayVersion,
 		description = "Display current addon version."
 	}
 }
@@ -863,16 +863,15 @@ function GBC_SlashCmd(msg)
 	end
 end
 
-
 SLASH_GBC1 = "/gbc"
 SlashCmdList["GBC"] = GBC_SlashCmd
 
 --MINIMAP BUTTON
 function GBC_MinimapBtn_DraggingFrame_OnUpdate()
-	minimap_old()
+	GBC_minimap_old()
 end
 
-function minimap_old()
+function GBC_minimap_old()
 	local xpos,ypos = GetCursorPosition()
 	local xmin,ymin = Minimap:GetLeft(), Minimap:GetBottom()
 
@@ -888,6 +887,6 @@ function minimap_old()
 end
 
 function GBC_MinimapBtn_OnClick()
-	ToggleRootFrame()
+	GBC_ToggleRootFrame()
 end
 
