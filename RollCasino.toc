@@ -1,10 +1,8 @@
 ## Interface: 32089
-## Title:|cFFFF7F7FR|cFFFFC47Fo|cFFFFFF7Fl|cFF7FFF7Fl|cFF7F7FFFC|cFFFF7FFFa|cFFFF7F7Fs|cFFFFC47Fi|cFFFFFF7Fn|cFF7FFF7Fo
+## Interface-BCC: 20502
+## Title: RollCasino
 ## Author: Looch
-## 1.13.2 Maintainer: Looch <The Greybeards> - Heartseeker
-## Version: 1.2.1
-## DefaultState: Disabled
-## LoadOnDemand: 0
+## Version: 2.0.0
 ## Notes: Role play as a degenerate gambler.
 ## SavedVariables: RollCasino
 
