@@ -14,7 +14,7 @@
   	<Font name="GBCFont_Banner" inherits="GameFontNormal" virtual="true">
   	</Font> <!--GBCFont_Banner-->
 <!-- FRAMES -->
-	<Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true">
+	<Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true" inherits="BackdropTemplate">
 		<Scripts>
 			<OnLoad>
 				GBC_OnLoad(self)
@@ -34,9 +34,11 @@
 		<Anchors>
 			<Anchor point="CENTER"/>
 		</Anchors>
-		<Backdrop bgFile="Interface\FrameGeneral\UI-Background-Marble" edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-			<BackgroundInsets left="10" right="10" top="10" bottom="10"/>
-		</Backdrop>
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
+			<KeyValue key="backdropBorderColor" value="LEGENDARY_ORANGE_COLOR" type="global"/>
+			<KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
+		</KeyValues>
 		<Frames>
 			<Button name="GBC_CloseWindow" inherits="UIPanelCloseButton">
 				<Anchors>
@@ -50,15 +52,15 @@
 					</OnClick>
 				</Scripts>
 			</Button> <!-- GBC_CloseWindow -->
-			<Frame name="GBC_Header">
+			<Frame name="GBC_Header" inherits="BackdropTemplate">
 				<Size y="90"/>
 				<Anchors >
 					<Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
 				</Anchors>
-				<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-					<BackgroundInsets left="12" right="12" top="12" bottom="12" />
-				</Backdrop>
+				<KeyValues>
+					<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+				</KeyValues>
 				<Layers>
 					<Layer level="OVERLAY">
 						<FontString name="BannerFS" inherits="GBCFont_Banner" text="Roll Casino">
@@ -75,24 +77,24 @@
 					</Layer>
 				</Layers>
 			</Frame><!-- GBC_Header -->
-			<Frame name="GBC_Panel_Upper">
+			<Frame name="GBC_Panel_Upper" inherits="BackdropTemplate">
 				<Size y="146"/>
 				<Anchors>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
 				</Anchors>
-				<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-					<BackgroundInsets left="12" right="12" top="12" bottom="12"/>
-				</Backdrop>
+				<KeyValues>
+					<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+				</KeyValues>
 				<Frames>
-					<Frame name="GBC_GameModes">
+					<Frame name="GBC_GameModes" inherits="BackdropTemplate">
 						<Size x="225"/>
 						<Anchors>
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
 						<Frames>
-							<Frame name="GBC_Ruleset_Container">
+							<Frame name="GBC_Ruleset_Container" inherits="BackdropTemplate">
 								<Anchors>
 									<Anchor relativeTo="GBC_GameModes" point="TOPLEFT">
 										<Offset x="16" y="-16"/>
@@ -108,7 +110,7 @@
 									</Anchor>
 								</Anchors>
 								<Frames>
-									<Frame name="GBC_Ruleset_Banner">
+									<Frame name="GBC_Ruleset_Banner" inherits="BackdropTemplate">
 										<Size y="40"/>
 										<Anchors>
 											<Anchor relativeTo="GBC_Ruleset_Container" point="TOPLEFT"/>
@@ -158,7 +160,7 @@
 							</Frame> <!--GBC_Ruleset_Container-->
 						</Frames>
 					</Frame> <!-- GBC_GameModes -->
-					<Frame name="GBC_Admin">
+					<Frame name="GBC_Admin" inherits="BackdropTemplate">
 						<Anchors>
 							<Anchor relativeTo="GBC_GameModes" relativePoint="TOPRIGHT" point="TOPLEFT">
 								<Offset x="16" y="-16"/>
@@ -174,7 +176,7 @@
 							</Anchor>
 						</Anchors>
 						<Frames>
-							<Frame name="GBC_Stats_Banner">
+							<Frame name="GBC_Stats_Banner" inherits="BackdropTemplate">
 								<Size y="40"/>
 								<Anchors>
 									<Anchor relativeTo="GBC_Admin" point="TOPLEFT"/>
@@ -218,7 +220,7 @@
 					</Frame> <!--GBC_Admin-->
 				</Frames>
 			</Frame> <!--GBC_Panel_Upper -->
-			<Frame name="GBC_Panel_Lower">
+			<Frame name="GBC_Panel_Lower" inherits="BackdropTemplate">
 				<Anchors>
 					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
 					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
@@ -226,17 +228,17 @@
 					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 				</Anchors>
 				<Frames>
-					<Frame name="GBC_RoundControls">
+					<Frame name="GBC_RoundControls" inherits="BackdropTemplate">
 						<Size x="225"/>
 						<Anchors>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
 						</Anchors>
-						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-							<BackgroundInsets left="12" right="12" top="12" bottom="12" />
-						</Backdrop>
+						<KeyValues>
+							<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+						</KeyValues>
 						<Frames>
-							<Frame name="GBC_RoundControls_Container">
+							<Frame name="GBC_RoundControls_Container" inherits="BackdropTemplate">
 								<Anchors>
 									<Anchor relativeTo="GBC_RoundControls" point="TOPLEFT">
 										<Offset x="16" y="-16"/>
@@ -252,7 +254,7 @@
 									</Anchor>
 								</Anchors>
 								<Frames>
-									<Frame name="GBC_Contols_Banner">
+									<Frame name="GBC_Contols_Banner" inherits="BackdropTemplate">
 										<Size y="40"/>
 										<Anchors>
 											<Anchor relativeTo="GBC_RoundControls_Container" point="TOPRIGHT"/>
@@ -268,7 +270,7 @@
 											</Layer>
 										</Layers>
 									</Frame><!--GBC_Contols_Banner-->
-									<Frame name="GBC_Label_Stakes">
+									<Frame name="GBC_Label_Stakes" inherits="BackdropTemplate">
 										<Size x="70" y="30"/>
 										<Anchors>
 											<Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
@@ -359,7 +361,7 @@
 											</OnClick>
 										</Scripts>
 									</Button> <!-- GBC_Btn_RoundReset -->
-									<Frame name="GBC_PersonalContols_Panel">
+									<Frame name="GBC_PersonalContols_Panel" inherits="BackdropTemplate">
 										<Anchors>
 											<Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
 												<Offset y="-10"/>
@@ -371,7 +373,7 @@
 											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 										</Anchors>
 										<Frames>
-											<Frame name="GBC_PersonalControls_Banner">
+											<Frame name="GBC_PersonalControls_Banner" inherits="BackdropTemplate">
 												<Size y="24"/>
 												<Anchors>
 													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPLEFT" point="TOPLEFT"/>
@@ -413,18 +415,18 @@
 							</Frame> <!-- GBC_RoundControls_Container -->
 						</Frames>
 					</Frame> <!-- GBC_RoundControls -->
-					<Frame name="GBC_Status">
+					<Frame name="GBC_Status" inherits="BackdropTemplate">
 						<Anchors>
 							<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
 							<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
 							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
 						</Anchors>
-						<Backdrop edgeFile="Interface\DialogFrame\UI-DialogBox-Gold-Border">
-							<BackgroundInsets left="11" right="12" top="12" bottom="11" />
-						</Backdrop>
+						<KeyValues>
+							<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+						</KeyValues>
 						<Frames>
-							<Frame name="GBC_Status_Container">
+							<Frame name="GBC_Status_Container" inherits="BackdropTemplate">
 								<Anchors>
 									<Anchor relativeTo="GBC_Status" point="TOPRIGHT">
 										<Offset x="-36" y="-14"/>
@@ -440,7 +442,7 @@
 									</Anchor>
 								</Anchors>
 								<Frames>
-									<Frame name="GBC_Status_Banner">
+									<Frame name="GBC_Status_Banner" inherits="BackdropTemplate">
 										<Size y="40"/>
 										<Anchors>
 											<Anchor relativeTo="GBC_Status_Container" point="TOPRIGHT"/>
