@@ -53,16 +53,7 @@ local function has_value(arr, val)
 end
 
 local function ConvertRollToGold(value)
-	local tempValue = tonumber(value)
-	silver = tempValue % 100
-	tempValue = math.floor(tempValue / 100)
-	tempValue = string.format("%sg", tempValue)
-	
-	if silver > 0 then
-		tempValue = string.format("%s %ds", tempValue, silver)
-	end
-	
-	return tempValue
+	return tostring(value) .. "g"
 end
 
 --TODO find a way to deep copy round defaults
