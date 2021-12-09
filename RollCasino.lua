@@ -22,7 +22,7 @@ local g_app = {
 	sessionStats = {},
 	minimapPosition = 75,
 	rulesName = "Hi/Lo",
-	version = "1.2.1", --TODO pull this from .toc
+	version = "2.0.0", --TODO pull this from .toc
 	banList = {},
 	minimap = { hide = false, },
 }
