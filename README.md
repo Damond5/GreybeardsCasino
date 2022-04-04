@@ -42,8 +42,3 @@ Say
 ## Slash Commands
 
 Type /gbc to display available commands.
-
- 
-
- 
- 

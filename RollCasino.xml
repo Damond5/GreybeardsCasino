@@ -1,628 +1,628 @@
 <Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-	xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="RollCasino.lua" />
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="http://www.blizzard.com/wow/ui/">
+  <Script file="RollCasino.lua" />
 <!-- TEMPLATES  -->
-	<Button name="GBC_StatusEntry_Template" virtual="true">
-	   <Size>
-	     <AbsDimension x="75" y="12"/>
-	   </Size>
-	   <NormalFont style="GameFontHighlightLeft"/>
-	</Button> <!-- GBC_StatusEntry_Template -->
-	<Font name="GBCFont" inherits="GameFontNormal" virtual="true">
-  	</Font> <!--GBCFont-->
-  	<Font name="GBCFont_Banner" inherits="GameFontNormal" virtual="true">
-  	</Font> <!--GBCFont_Banner-->
+  <Button name="GBC_StatusEntry_Template" virtual="true">
+    <Size>
+      <AbsDimension x="75" y="12"/>
+    </Size>
+    <NormalFont style="GameFontHighlightLeft"/>
+  </Button> <!-- GBC_StatusEntry_Template -->
+  <Font name="GBCFont" inherits="GameFontNormal" virtual="true">
+    </Font> <!--GBCFont-->
+    <Font name="GBCFont_Banner" inherits="GameFontNormal" virtual="true">
+    </Font> <!--GBCFont_Banner-->
 <!-- FRAMES -->
-	<Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true" inherits="BackdropTemplate">
-		<Scripts>
-			<OnLoad>
-				GBC_OnLoad(self)
-			</OnLoad>
-			<OnEvent>
-				GBC_OnEvent(self, event, ...)
-			</OnEvent>
-			<OnDragStart>
-				self:StartMoving()
-			</OnDragStart>
-  			<OnDragStop>
-  				self:StopMovingOrSizing()
-  			</OnDragStop>
-		</Scripts>
-		<Size x="450" y="535"/>
-		<Absposition x="100" y="100"/>
-		<Anchors>
-			<Anchor point="CENTER"/>
-		</Anchors>
-		<KeyValues>
-			<KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
-			<KeyValue key="backdropBorderColor" value="LEGENDARY_ORANGE_COLOR" type="global"/>
-			<KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
-		</KeyValues>
-		<Frames>
-			<Button name="GBC_CloseWindow" inherits="UIPanelCloseButton">
-				<Anchors>
-					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT">
-						<Offset x="-4" y="-4"/>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						GBC_CloseFrame()
-					</OnClick>
-				</Scripts>
-			</Button> <!-- GBC_CloseWindow -->
-			<Frame name="GBC_Header" inherits="BackdropTemplate">
-				<Size y="90"/>
-				<Anchors >
-					<Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
-					<Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
-				</Anchors>
-				<KeyValues>
-					<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
-				</KeyValues>
-				<Layers>
-					<Layer level="OVERLAY">
-						<FontString name="BannerFS" inherits="GBCFont_Banner" text="Roll Casino">
-							<Color r="1" g="1" b="1" a="1"/>
-							<FontHeight val="60"/>
-							<Shadow>
-							    <Offset x="1" y="1" />
-							    <Color r="0" g="0" b="0"/>
-						  	</Shadow>
-							<Anchors>
-								<Anchor relativeTo="GBC_Header" relativePoint="CENTER" point="CENTER"/>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
-			</Frame><!-- GBC_Header -->
-			<Frame name="GBC_Panel_Upper" inherits="BackdropTemplate">
-				<Size y="146"/>
-				<Anchors>
-					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-					<Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-				</Anchors>
-				<KeyValues>
-					<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
-				</KeyValues>
-				<Frames>
-					<Frame name="GBC_GameModes" inherits="BackdropTemplate">
-						<Size x="225"/>
-						<Anchors>
-							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
-							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
-						</Anchors>
-						<Frames>
-							<Frame name="GBC_Ruleset_Container" inherits="BackdropTemplate">
-								<Anchors>
-									<Anchor relativeTo="GBC_GameModes" point="TOPLEFT">
-										<Offset x="16" y="-16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_GameModes" point="BOTTOMLEFT">
-										<Offset x="16" y="16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_GameModes" point="BOTTOMRIGHT">
-										<Offset x="-16" y="16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_GameModes" point="TOPRIGHT">
-										<Offset x="-16" y="-16"/>
-									</Anchor>
-								</Anchors>
-								<Frames>
-									<Frame name="GBC_Ruleset_Banner" inherits="BackdropTemplate">
-										<Size y="40"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Ruleset_Container" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_Ruleset_Container" point="TOPRIGHT"/>
-										</Anchors>
-										<Layers>
-											<Layer level="OVERLAY">
-												<FontString inherits="GBCFont" text="THE RULES">
-													<Anchors>
-														<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="CENTER" point="CENTER"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
-									</Frame><!--GBC_Ruleset_Banner-->
-									<Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
-										<Size y="26"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-											<Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-										</Anchors>
-										<Scripts>
-											<OnClick>
-												GBC_Btn_RulesDisplay_OnClick()
-											</OnClick>
-										</Scripts>
-									</Button> <!--GBC_Btn_RulesDisplay-->
-									<Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
-										<Anchors>
-											<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
-												<Offset x="-16"/>
-											</Anchor>
-											<Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT">
-												<Offset x="-16"/>
-											</Anchor>
-										</Anchors>
-										<Scripts>
-											<OnLoad>
-												UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
-											</OnLoad>
-											<OnClick>
-												GBC_Btn_ChatBroadcast_OnClick()
-											</OnClick>
-										</Scripts>
-									</Button> <!--GBC_Btn_ChatBroadcast -->
-								</Frames>
-							</Frame> <!--GBC_Ruleset_Container-->
-						</Frames>
-					</Frame> <!-- GBC_GameModes -->
-					<Frame name="GBC_Admin" inherits="BackdropTemplate">
-						<Anchors>
-							<Anchor relativeTo="GBC_GameModes" relativePoint="TOPRIGHT" point="TOPLEFT">
-								<Offset x="16" y="-16"/>
-							</Anchor>
-							<Anchor relativeTo="GBC_GameModes" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT">
-								<Offset x="16" y="16"/>
-							</Anchor>
-							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT">
-								<Offset x="-16" y="16"/>
-							</Anchor>
-							<Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT">
-								<Offset x="-16" y="-16"/>
-							</Anchor>
-						</Anchors>
-						<Frames>
-							<Frame name="GBC_Stats_Banner" inherits="BackdropTemplate">
-								<Size y="40"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Admin" point="TOPLEFT"/>
-									<Anchor relativeTo="GBC_Admin" point="TOPRIGHT"/>
-								</Anchors>
-								<Layers>
-									<Layer level="OVERLAY">
-										<FontString inherits="GBCFont" text="THE STATS">
-											<Anchors>
-												<Anchor relativeTo="GBC_Stats_Banner" relativePoint="CENTER" point="CENTER"/>
-											</Anchors>
-										</FontString>
-									</Layer>
-								</Layers>
-							</Frame><!--GBC_Stats_Banner-->
-							<Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Broadcast Stats">
-								<Size y="26"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnClick>
-										GBC_Btn_StatsDisplay_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_StatsDisplay-->
-							<Button name="GBC_Btn_StatsReset" inherits="OptionsButtonTemplate" text="Reset Stats">
-								<Size y="26"/>
-								<Anchors>
-									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-									<Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-								</Anchors>
-								<Scripts>
-									<OnClick>
-										GBC_Btn_StatsReset_OnClick()
-									</OnClick>
-								</Scripts>
-							</Button> <!--GBC_Btn_StatsReset-->
-						</Frames>
-					</Frame> <!--GBC_Admin-->
-				</Frames>
-			</Frame> <!--GBC_Panel_Upper -->
-			<Frame name="GBC_Panel_Lower" inherits="BackdropTemplate">
-				<Anchors>
-					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-					<Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
-					<Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
-				</Anchors>
-				<Frames>
-					<Frame name="GBC_RoundControls" inherits="BackdropTemplate">
-						<Size x="225"/>
-						<Anchors>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
-						</Anchors>
-						<KeyValues>
-							<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
-						</KeyValues>
-						<Frames>
-							<Frame name="GBC_RoundControls_Container" inherits="BackdropTemplate">
-								<Anchors>
-									<Anchor relativeTo="GBC_RoundControls" point="TOPLEFT">
-										<Offset x="16" y="-16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_RoundControls" point="BOTTOMLEFT">
-										<Offset x="16" y="16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_RoundControls" point="BOTTOMRIGHT">
-										<Offset x="-16" y="16"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_RoundControls" point="TOPRIGHT">
-										<Offset x="-16" y="-16"/>
-									</Anchor>
-								</Anchors>
-								<Frames>
-									<Frame name="GBC_Contols_Banner" inherits="BackdropTemplate">
-										<Size y="40"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_RoundControls_Container" point="TOPRIGHT"/>
-											<Anchor relativeTo="GBC_RoundControls_Container" point="TOPLEFT"/>
-										</Anchors>
-										<Layers>
-											<Layer level="OVERLAY">
-												<FontString inherits="GBCFont" text="THE CONTROLS">
-													<Anchors>
-														<Anchor relativeTo="GBC_Contols_Banner" relativePoint="CENTER" point="CENTER"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
-									</Frame><!--GBC_Contols_Banner-->
-									<Frame name="GBC_Label_Stakes" inherits="BackdropTemplate">
-										<Size x="70" y="30"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-										</Anchors>
-										<Layers>
-											<Layer level="OVERLAY">
-												<FontString name="GBCStakesLabel" inherits="GameFontNormal" text="Stakes: ">
-													<Anchors>
-														<Anchor relativeTo="GBC_Label_Stakes" relativePoint="CENTER" point="CENTER"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
-									</Frame> <!-- GBC_Label_Stakes -->
-									<EditBox name="GBC_EditBox_Stakes" letters="7">
-										<Size y="30"/>
-										<Scripts>
-											<OnLoad>
-												GBC_EditBox_Stakes_OnLoad()
-											</OnLoad>
-											<OnEnterPressed>
-												GBC_EditBox_Stakes_OnEnterPressed()
-											</OnEnterPressed>
-											<OnEscapePressed>
-												GBC_EditBox_Stakes_OnEnterPressed()
-											</OnEscapePressed>
-										</Scripts>
-										<FontString inherits="ChatFontNormal" justifyH="CENTER"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Label_Stakes" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-										<Layers>
-											<Layer level="BACKGROUND">
-											 	<Texture file="Interface\ChatFrame\UI-ChatInputBorder-LEFT">
-									                <Anchors>
-									                    <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPLEFT" point="TOPLEFT"/> 
-									                    <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPRIGHT" point="TOPRIGHT"/> 
-									                </Anchors>
-								            	</Texture>
-								            	<Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
-													<Anchors>
-									                    <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPLEFT" point="TOPLEFT"/> 
-									                    <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-									                </Anchors>
-									                <TexCoord left="0.5"/>
-												</Texture>
-											</Layer>
-										</Layers>
-									</EditBox> <!-- GBC_EditBox_Stakes -->
-									<Button name="GBC_Btn_RoundNext" inherits="OptionsButtonTemplate" text="Start Round">
-										<Size y="70"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT">
-												<Offset y="-8"/>
-											</Anchor>
-											<Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
-												<Offset y="-8"/>
-											</Anchor>
-										</Anchors>
-										<Scripts>
-											<OnClick>
-												GBC_Btn_RoundNext_OnClick()
-											</OnClick>
-										</Scripts>
-									</Button> <!-- GBC_Btn_RoundNext -->
-									<Button name="GBC_Btn_ListRemaining" inherits="OptionsButtonTemplate" text="List Remaining">
-										<Size y="26"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-										<Scripts>
-											<OnClick>
-												GBC_Btn_ListRemaining_OnClick()
-											</OnClick>
-										</Scripts>
-									</Button> <!-- GBC_Btn_ListRemaining -->
-									<Button name="GBC_Btn_RoundReset" inherits="OptionsButtonTemplate" text="Reset Round">
-										<Size y="26"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-											<Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-										</Anchors>
-										<Scripts>
-											<OnClick>
-												GBC_Btn_RoundReset_OnClick()
-											</OnClick>
-										</Scripts>
-									</Button> <!-- GBC_Btn_RoundReset -->
-									<Frame name="GBC_PersonalContols_Panel" inherits="BackdropTemplate">
-										<Anchors>
-											<Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
-												<Offset y="-10"/>
-											</Anchor>
-											<Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMLEFT" point="TOPLEFT">
-												<Offset y="-10"/>
-											</Anchor>
-											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
-											<Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
-										</Anchors>
-										<Frames>
-											<Frame name="GBC_PersonalControls_Banner" inherits="BackdropTemplate">
-												<Size y="24"/>
-												<Anchors>
-													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPLEFT" point="TOPLEFT"/>
-													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-												</Anchors>
-												<Layers>
-													<Layer level="OVERLAY">
-														<FontString inherits="GBCFont" text="Personal Controls" justifyH="CENTER"/>
-													</Layer>
-												</Layers>
-											</Frame><!--GBC_PersonalControls_Banner-->
-											<Button name="GBC_Btn_PersonalEnter" inherits="OptionsButtonTemplate" text="Enter">
-												<Size x="96"/>
-												<Anchors>
-													<Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-													<Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
-												</Anchors>
-												<Scripts>
-													<OnClick>
-														GBC_Btn_PersonalEnter_OnClick()
-													</OnClick>
-												</Scripts>
-											</Button> <!-- GBC_Btn_RoundReset -->
-											<Button name="GBC_Btn_PersonalRoll" inherits="OptionsButtonTemplate" text="Roll">
-												<Anchors>
-													<Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-													<Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
-													<Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-												</Anchors>
-												<Scripts>
-													<OnClick>
-														GBC_Btn_PersonalRoll_OnClick()
-													</OnClick>
-												</Scripts>
-											</Button> <!-- GBC_Btn_RoundReset -->
-										</Frames>
-									</Frame><!--GBC_PersonalContols_Panel-->
-								</Frames>
-							</Frame> <!-- GBC_RoundControls_Container -->
-						</Frames>
-					</Frame> <!-- GBC_RoundControls -->
-					<Frame name="GBC_Status" inherits="BackdropTemplate">
-						<Anchors>
-							<Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
-							<Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
-							<Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-						</Anchors>
-						<KeyValues>
-							<KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
-						</KeyValues>
-						<Frames>
-							<Frame name="GBC_Status_Container" inherits="BackdropTemplate">
-								<Anchors>
-									<Anchor relativeTo="GBC_Status" point="TOPRIGHT">
-										<Offset x="-36" y="-14"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_Status" point="TOPLEFT">
-										<Offset x="16" y="-14"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_Status" point="BOTTOMRIGHT">
-										<Offset x="-36" y="10"/>
-									</Anchor>
-									<Anchor relativeTo="GBC_Status" point="BOTTOMLEFT">
-										<Offset x="16" y="10"/>
-									</Anchor>
-								</Anchors>
-								<Frames>
-									<Frame name="GBC_Status_Banner" inherits="BackdropTemplate">
-										<Size y="40"/>
-										<Anchors>
-											<Anchor relativeTo="GBC_Status_Container" point="TOPRIGHT"/>
-											<Anchor relativeTo="GBC_Status_Container" point="TOPLEFT"/>
-										</Anchors>
-										<Layers>
-											<Layer level="OVERLAY">
-												<FontString inherits="GBCFont" text="THE ACTION">
-													<Anchors>
-														<Anchor relativeTo="GBC_Status_Banner" relativePoint="CENTER" point="CENTER"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
-									</Frame><!--GBC_Status_Banner-->
-									<ScrollFrame name="GBC_StatusInfo" inherits="FauxScrollFrameTemplate">
-										<Anchors>
-											<Anchor relativeTo="GBC_Status_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-											<Anchor relativeTo="GBC_Status_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_Status_Container" point="BOTTOMRIGHT"/>
-											<Anchor relativeTo="GBC_Status_Container" point="BOTTOMLEFT"/>
-										</Anchors>
-										<Scripts>
-											<OnVerticalScroll>
-												FauxScrollFrame_OnVerticalScroll(self, offset, 12, GBC_StatusInfo_Update)
-											</OnVerticalScroll>
-											<OnLoad>
-												GBC_StatusInfo_Update()
-											</OnLoad>
-										</Scripts>
-									</ScrollFrame> <!-- GBC_StatusInfo -->
-									<Button name="GBC_StatusEntry_1" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusInfo" relativePoint="TOPLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusInfo" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_2" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_1" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_1" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_3" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_2" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_2" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_4" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_3" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_3" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_5" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_4" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_4" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_6" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_5" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_5" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_7" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_6" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_6" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_8" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_7" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_7" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_9" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_8" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_8" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_10" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_9" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_9" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_11" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_10" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_10" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_12" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_11" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_11" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_13" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_12" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_12" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_14" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_13" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_13" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-									<Button name="GBC_StatusEntry_15" inherits="GBC_StatusEntry_Template">
-										<Anchors>
-											<Anchor relativeTo="GBC_StatusEntry_14" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
-											<Anchor relativeTo="GBC_StatusEntry_14" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
-										</Anchors>
-									</Button>
-								</Frames>
-							</Frame> <!-- GBC_Status_Container -->
-						</Frames>
-					</Frame> <!-- GBC_Status -->
-				</Frames>
-			</Frame> <!--GBC_Panel_Lower-->
-		</Frames>
-	</Frame> <!-- GBC_Root -->
-	<Button name="GBC_MinimapBtn" parent="Minimap" enableMouse="true" movable="true" hidden="false">
-		<Size x="30" y="30"/>
-		<Anchors>
-			<Anchor point="TOPLEFT"/>
-		</Anchors>
-		<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
-		<Layers>
-			<Layer level="OVERLAY" textureSubLevel="1">
-				<Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\RollCasino\media\icon">
-					<Size x="18" y="18"/>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="7" y="-6"/>
-						</Anchor>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="OVERLAY" textureSubLevel="2">
-				<Texture file="Interface\Minimap\MiniMap-TrackingBorder">
-					<Size x="48" y="48"/>
-					<Anchors>
-						<Anchor point="TOPLEFT"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Frame name="GBC_MinimapBtn_DraggingFrame" hidden="true">
-				<Scripts>
-					<OnUpdate>
-						GBC_MinimapBtn_DraggingFrame_OnUpdate()
-					</OnUpdate>
-				</Scripts>
-			</Frame><!--GBC_MinimapBtn_DraggingFrame-->
-		</Frames>
-		<Scripts>
-			<OnLoad>
-				self:RegisterForClicks("LeftButtonUp","RightButtonUp")
-				self:RegisterForDrag("LeftButton","RightButton")
-			</OnLoad>
-			<OnDragStart>
-				self:LockHighlight()
-				GBC_MinimapBtn_DraggingFrame:Show()
-			</OnDragStart>
-			<OnDragStop>
-				self:UnlockHighlight()
-				GBC_MinimapBtn_DraggingFrame:Hide()
-			</OnDragStop>
-			<OnClick>
-				GBC_MinimapBtn_OnClick()
-			</OnClick>
-		</Scripts>
-	</Button> <!--GBC_MinimapBtn -->
+  <Frame name="GBC_Root" parent="UIParent" movable="true" enableMouse="true" inherits="BackdropTemplate">
+    <Scripts>
+      <OnLoad>
+        GBC_OnLoad(self)
+      </OnLoad>
+      <OnEvent>
+        GBC_OnEvent(self, event, ...)
+      </OnEvent>
+      <OnDragStart>
+        self:StartMoving()
+      </OnDragStart>
+        <OnDragStop>
+          self:StopMovingOrSizing()
+        </OnDragStop>
+    </Scripts>
+    <Size x="450" y="535"/>
+    <Absposition x="100" y="100"/>
+    <Anchors>
+      <Anchor point="CENTER"/>
+    </Anchors>
+    <KeyValues>
+      <KeyValue key="backdropInfo" value="BACKDROP_TOOLTIP_16_16_5555" type="global"/>
+      <KeyValue key="backdropBorderColor" value="LEGENDARY_ORANGE_COLOR" type="global"/>
+      <KeyValue key="backdropBorderColorAlpha" value="0.25" type="number"/>
+    </KeyValues>
+    <Frames>
+      <Button name="GBC_CloseWindow" inherits="UIPanelCloseButton">
+        <Anchors>
+          <Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT">
+            <Offset x="-4" y="-4"/>
+          </Anchor>
+        </Anchors>
+        <Scripts>
+          <OnClick>
+            GBC_CloseFrame()
+          </OnClick>
+        </Scripts>
+      </Button> <!-- GBC_CloseWindow -->
+      <Frame name="GBC_Header" inherits="BackdropTemplate">
+        <Size y="90"/>
+        <Anchors >
+          <Anchor relativeTo="GBC_Root" point="TOPLEFT" relativepoint="TOPLEFT"/>
+          <Anchor relativeTo="GBC_Root" point="TOPRIGHT" relativepoint="TOPRIGHT"/>
+        </Anchors>
+        <KeyValues>
+          <KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+        </KeyValues>
+        <Layers>
+          <Layer level="OVERLAY">
+            <FontString name="BannerFS" inherits="GBCFont_Banner" text="Roll Casino">
+              <Color r="1" g="1" b="1" a="1"/>
+              <FontHeight val="60"/>
+              <Shadow>
+                <Offset x="1" y="1" />
+                <Color r="0" g="0" b="0"/>
+              </Shadow>
+              <Anchors>
+                <Anchor relativeTo="GBC_Header" relativePoint="CENTER" point="CENTER"/>
+              </Anchors>
+            </FontString>
+          </Layer>
+        </Layers>
+      </Frame><!-- GBC_Header -->
+      <Frame name="GBC_Panel_Upper" inherits="BackdropTemplate">
+        <Size y="146"/>
+        <Anchors>
+          <Anchor relativeTo="GBC_Header" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+          <Anchor relativeTo="GBC_Header" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+        </Anchors>
+        <KeyValues>
+          <KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+        </KeyValues>
+        <Frames>
+          <Frame name="GBC_GameModes" inherits="BackdropTemplate">
+            <Size x="225"/>
+            <Anchors>
+              <Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPLEFT" point="TOPLEFT"/>
+              <Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+            </Anchors>
+            <Frames>
+              <Frame name="GBC_Ruleset_Container" inherits="BackdropTemplate">
+                <Anchors>
+                  <Anchor relativeTo="GBC_GameModes" point="TOPLEFT">
+                    <Offset x="16" y="-16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_GameModes" point="BOTTOMLEFT">
+                    <Offset x="16" y="16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_GameModes" point="BOTTOMRIGHT">
+                    <Offset x="-16" y="16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_GameModes" point="TOPRIGHT">
+                    <Offset x="-16" y="-16"/>
+                  </Anchor>
+                </Anchors>
+                <Frames>
+                  <Frame name="GBC_Ruleset_Banner" inherits="BackdropTemplate">
+                    <Size y="40"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Ruleset_Container" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_Ruleset_Container" point="TOPRIGHT"/>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="OVERLAY">
+                        <FontString inherits="GBCFont" text="THE RULES">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="CENTER" point="CENTER"/>
+                          </Anchors>
+                        </FontString>
+                      </Layer>
+                    </Layers>
+                  </Frame><!--GBC_Ruleset_Banner-->
+                  <Button name="GBC_Btn_RulesDisplay" inherits="OptionsButtonTemplate" text="Broadcast Rules">
+                    <Size y="26"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                      <Anchor relativeTo="GBC_Ruleset_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        GBC_Btn_RulesDisplay_OnClick()
+                      </OnClick>
+                    </Scripts>
+                  </Button> <!--GBC_Btn_RulesDisplay-->
+                  <Button name="GBC_Btn_ChatBroadcast" inherits="UIDropDownMenuTemplate" text="Broadcast to: Raid">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+                        <Offset x="-16"/>
+                      </Anchor>
+                      <Anchor relativeTo="GBC_Btn_RulesDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+                        <Offset x="-16"/>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnLoad>
+                        UIDropDownMenu_Initialize(self, GBC_Btn_ChatBroadcast_OnLoad)
+                      </OnLoad>
+                      <OnClick>
+                        GBC_Btn_ChatBroadcast_OnClick()
+                      </OnClick>
+                    </Scripts>
+                  </Button> <!--GBC_Btn_ChatBroadcast -->
+                </Frames>
+              </Frame> <!--GBC_Ruleset_Container-->
+            </Frames>
+          </Frame> <!-- GBC_GameModes -->
+          <Frame name="GBC_Admin" inherits="BackdropTemplate">
+            <Anchors>
+              <Anchor relativeTo="GBC_GameModes" relativePoint="TOPRIGHT" point="TOPLEFT">
+                <Offset x="16" y="-16"/>
+              </Anchor>
+              <Anchor relativeTo="GBC_GameModes" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT">
+                <Offset x="16" y="16"/>
+              </Anchor>
+              <Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT">
+                <Offset x="-16" y="16"/>
+              </Anchor>
+              <Anchor relativeTo="GBC_Panel_Upper" relativePoint="TOPRIGHT" point="TOPRIGHT">
+                <Offset x="-16" y="-16"/>
+              </Anchor>
+            </Anchors>
+            <Frames>
+              <Frame name="GBC_Stats_Banner" inherits="BackdropTemplate">
+                <Size y="40"/>
+                <Anchors>
+                  <Anchor relativeTo="GBC_Admin" point="TOPLEFT"/>
+                  <Anchor relativeTo="GBC_Admin" point="TOPRIGHT"/>
+                </Anchors>
+                <Layers>
+                  <Layer level="OVERLAY">
+                    <FontString inherits="GBCFont" text="THE STATS">
+                      <Anchors>
+                        <Anchor relativeTo="GBC_Stats_Banner" relativePoint="CENTER" point="CENTER"/>
+                      </Anchors>
+                    </FontString>
+                  </Layer>
+                </Layers>
+              </Frame><!--GBC_Stats_Banner-->
+              <Button name="GBC_Btn_StatsDisplay" inherits="OptionsButtonTemplate" text="Broadcast Stats">
+                <Size y="26"/>
+                <Anchors>
+                  <Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                  <Anchor relativeTo="GBC_Stats_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    GBC_Btn_StatsDisplay_OnClick()
+                  </OnClick>
+                </Scripts>
+              </Button> <!--GBC_Btn_StatsDisplay-->
+              <Button name="GBC_Btn_StatsReset" inherits="OptionsButtonTemplate" text="Reset Stats">
+                <Size y="26"/>
+                <Anchors>
+                  <Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                  <Anchor relativeTo="GBC_Btn_StatsDisplay" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                </Anchors>
+                <Scripts>
+                  <OnClick>
+                    GBC_Btn_StatsReset_OnClick()
+                  </OnClick>
+                </Scripts>
+              </Button> <!--GBC_Btn_StatsReset-->
+            </Frames>
+          </Frame> <!--GBC_Admin-->
+        </Frames>
+      </Frame> <!--GBC_Panel_Upper -->
+      <Frame name="GBC_Panel_Lower" inherits="BackdropTemplate">
+        <Anchors>
+          <Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+          <Anchor relativeTo="GBC_Panel_Upper" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+          <Anchor relativeTo="GBC_Root" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+          <Anchor relativeTo="GBC_Root" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+        </Anchors>
+        <Frames>
+          <Frame name="GBC_RoundControls" inherits="BackdropTemplate">
+            <Size x="225"/>
+            <Anchors>
+              <Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPLEFT" point="TOPLEFT"/>
+              <Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+            </Anchors>
+            <KeyValues>
+              <KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+            </KeyValues>
+            <Frames>
+              <Frame name="GBC_RoundControls_Container" inherits="BackdropTemplate">
+                <Anchors>
+                  <Anchor relativeTo="GBC_RoundControls" point="TOPLEFT">
+                    <Offset x="16" y="-16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_RoundControls" point="BOTTOMLEFT">
+                    <Offset x="16" y="16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_RoundControls" point="BOTTOMRIGHT">
+                    <Offset x="-16" y="16"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_RoundControls" point="TOPRIGHT">
+                    <Offset x="-16" y="-16"/>
+                  </Anchor>
+                </Anchors>
+                <Frames>
+                  <Frame name="GBC_Contols_Banner" inherits="BackdropTemplate">
+                    <Size y="40"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_RoundControls_Container" point="TOPRIGHT"/>
+                      <Anchor relativeTo="GBC_RoundControls_Container" point="TOPLEFT"/>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="OVERLAY">
+                        <FontString inherits="GBCFont" text="THE CONTROLS">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_Contols_Banner" relativePoint="CENTER" point="CENTER"/>
+                          </Anchors>
+                        </FontString>
+                      </Layer>
+                    </Layers>
+                  </Frame><!--GBC_Contols_Banner-->
+                  <Frame name="GBC_Label_Stakes" inherits="BackdropTemplate">
+                    <Size x="70" y="30"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="OVERLAY">
+                        <FontString name="GBCStakesLabel" inherits="GameFontNormal" text="Stakes: ">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_Label_Stakes" relativePoint="CENTER" point="CENTER"/>
+                          </Anchors>
+                        </FontString>
+                      </Layer>
+                    </Layers>
+                  </Frame> <!-- GBC_Label_Stakes -->
+                  <EditBox name="GBC_EditBox_Stakes" letters="7">
+                    <Size y="30"/>
+                    <Scripts>
+                      <OnLoad>
+                        GBC_EditBox_Stakes_OnLoad()
+                      </OnLoad>
+                      <OnEnterPressed>
+                        GBC_EditBox_Stakes_OnEnterPressed()
+                      </OnEnterPressed>
+                      <OnEscapePressed>
+                        GBC_EditBox_Stakes_OnEnterPressed()
+                      </OnEscapePressed>
+                    </Scripts>
+                    <FontString inherits="ChatFontNormal" justifyH="CENTER"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Label_Stakes" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_Contols_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="BACKGROUND">
+                        <Texture file="Interface\ChatFrame\UI-ChatInputBorder-LEFT">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPLEFT" point="TOPLEFT"/> 
+                            <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPRIGHT" point="TOPRIGHT"/> 
+                          </Anchors>
+                        </Texture>
+                        <Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPLEFT" point="TOPLEFT"/> 
+                            <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+                          </Anchors>
+                          <TexCoord left="0.5"/>
+                        </Texture>
+                      </Layer>
+                    </Layers>
+                  </EditBox> <!-- GBC_EditBox_Stakes -->
+                  <Button name="GBC_Btn_RoundNext" inherits="OptionsButtonTemplate" text="Start Round">
+                    <Size y="70"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Label_Stakes" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+                        <Offset y="-8"/>
+                      </Anchor>
+                      <Anchor relativeTo="GBC_EditBox_Stakes" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+                        <Offset y="-8"/>
+                      </Anchor>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        GBC_Btn_RoundNext_OnClick()
+                      </OnClick>
+                    </Scripts>
+                  </Button> <!-- GBC_Btn_RoundNext -->
+                  <Button name="GBC_Btn_ListRemaining" inherits="OptionsButtonTemplate" text="List Remaining">
+                    <Size y="26"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_Btn_RoundNext" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        GBC_Btn_ListRemaining_OnClick()
+                      </OnClick>
+                    </Scripts>
+                  </Button> <!-- GBC_Btn_ListRemaining -->
+                  <Button name="GBC_Btn_RoundReset" inherits="OptionsButtonTemplate" text="Reset Round">
+                    <Size y="26"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                      <Anchor relativeTo="GBC_Btn_ListRemaining" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                    </Anchors>
+                    <Scripts>
+                      <OnClick>
+                        GBC_Btn_RoundReset_OnClick()
+                      </OnClick>
+                    </Scripts>
+                  </Button> <!-- GBC_Btn_RoundReset -->
+                  <Frame name="GBC_PersonalContols_Panel" inherits="BackdropTemplate">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMRIGHT" point="TOPRIGHT">
+                        <Offset y="-10"/>
+                      </Anchor>
+                      <Anchor relativeTo="GBC_Btn_RoundReset" relativePoint="BOTTOMLEFT" point="TOPLEFT">
+                        <Offset y="-10"/>
+                      </Anchor>
+                      <Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+                      <Anchor relativeTo="GBC_RoundControls_Container" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Frames>
+                      <Frame name="GBC_PersonalControls_Banner" inherits="BackdropTemplate">
+                        <Size y="24"/>
+                        <Anchors>
+                          <Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPLEFT" point="TOPLEFT"/>
+                          <Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+                        </Anchors>
+                        <Layers>
+                          <Layer level="OVERLAY">
+                            <FontString inherits="GBCFont" text="Personal Controls" justifyH="CENTER"/>
+                          </Layer>
+                        </Layers>
+                      </Frame><!--GBC_PersonalControls_Banner-->
+                      <Button name="GBC_Btn_PersonalEnter" inherits="OptionsButtonTemplate" text="Enter">
+                        <Size x="96"/>
+                        <Anchors>
+                          <Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                          <Anchor relativeTo="GBC_PersonalContols_Panel" relativePoint="BOTTOMLEFT" point="BOTTOMLEFT"/>
+                        </Anchors>
+                        <Scripts>
+                          <OnClick>
+                            GBC_Btn_PersonalEnter_OnClick()
+                          </OnClick>
+                        </Scripts>
+                      </Button> <!-- GBC_Btn_RoundReset -->
+                      <Button name="GBC_Btn_PersonalRoll" inherits="OptionsButtonTemplate" text="Roll">
+                        <Anchors>
+                          <Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+                          <Anchor relativeTo="GBC_Btn_PersonalEnter" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+                          <Anchor relativeTo="GBC_PersonalControls_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                        </Anchors>
+                        <Scripts>
+                          <OnClick>
+                            GBC_Btn_PersonalRoll_OnClick()
+                          </OnClick>
+                        </Scripts>
+                      </Button> <!-- GBC_Btn_RoundReset -->
+                    </Frames>
+                  </Frame><!--GBC_PersonalContols_Panel-->
+                </Frames>
+              </Frame> <!-- GBC_RoundControls_Container -->
+            </Frames>
+          </Frame> <!-- GBC_RoundControls -->
+          <Frame name="GBC_Status" inherits="BackdropTemplate">
+            <Anchors>
+              <Anchor relativeTo="GBC_RoundControls" relativePoint="TOPRIGHT" point="TOPLEFT"/>
+              <Anchor relativeTo="GBC_RoundControls" relativePoint="BOTTOMRIGHT" point="BOTTOMLEFT"/>
+              <Anchor relativeTo="GBC_Panel_Lower" relativePoint="BOTTOMRIGHT" point="BOTTOMRIGHT"/>
+              <Anchor relativeTo="GBC_Panel_Lower" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+            </Anchors>
+            <KeyValues>
+              <KeyValue key="backdropInfo" value="BACKDROP_DARK_DIALOG_32_32" type="global"/>
+            </KeyValues>
+            <Frames>
+              <Frame name="GBC_Status_Container" inherits="BackdropTemplate">
+                <Anchors>
+                  <Anchor relativeTo="GBC_Status" point="TOPRIGHT">
+                    <Offset x="-36" y="-14"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_Status" point="TOPLEFT">
+                    <Offset x="16" y="-14"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_Status" point="BOTTOMRIGHT">
+                    <Offset x="-36" y="10"/>
+                  </Anchor>
+                  <Anchor relativeTo="GBC_Status" point="BOTTOMLEFT">
+                    <Offset x="16" y="10"/>
+                  </Anchor>
+                </Anchors>
+                <Frames>
+                  <Frame name="GBC_Status_Banner" inherits="BackdropTemplate">
+                    <Size y="40"/>
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Status_Container" point="TOPRIGHT"/>
+                      <Anchor relativeTo="GBC_Status_Container" point="TOPLEFT"/>
+                    </Anchors>
+                    <Layers>
+                      <Layer level="OVERLAY">
+                        <FontString inherits="GBCFont" text="THE ACTION">
+                          <Anchors>
+                            <Anchor relativeTo="GBC_Status_Banner" relativePoint="CENTER" point="CENTER"/>
+                          </Anchors>
+                        </FontString>
+                      </Layer>
+                    </Layers>
+                  </Frame><!--GBC_Status_Banner-->
+                  <ScrollFrame name="GBC_StatusInfo" inherits="FauxScrollFrameTemplate">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_Status_Banner" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                      <Anchor relativeTo="GBC_Status_Banner" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_Status_Container" point="BOTTOMRIGHT"/>
+                      <Anchor relativeTo="GBC_Status_Container" point="BOTTOMLEFT"/>
+                    </Anchors>
+                    <Scripts>
+                      <OnVerticalScroll>
+                        FauxScrollFrame_OnVerticalScroll(self, offset, 12, GBC_StatusInfo_Update)
+                      </OnVerticalScroll>
+                      <OnLoad>
+                        GBC_StatusInfo_Update()
+                      </OnLoad>
+                    </Scripts>
+                  </ScrollFrame> <!-- GBC_StatusInfo -->
+                  <Button name="GBC_StatusEntry_1" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusInfo" relativePoint="TOPLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusInfo" relativePoint="TOPRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_2" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_1" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_1" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_3" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_2" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_2" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_4" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_3" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_3" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_5" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_4" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_4" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_6" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_5" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_5" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_7" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_6" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_6" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_8" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_7" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_7" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_9" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_8" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_8" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_10" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_9" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_9" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_11" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_10" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_10" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_12" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_11" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_11" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_13" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_12" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_12" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_14" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_13" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_13" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                  <Button name="GBC_StatusEntry_15" inherits="GBC_StatusEntry_Template">
+                    <Anchors>
+                      <Anchor relativeTo="GBC_StatusEntry_14" relativePoint="BOTTOMLEFT" point="TOPLEFT"/>
+                      <Anchor relativeTo="GBC_StatusEntry_14" relativePoint="BOTTOMRIGHT" point="TOPRIGHT"/>
+                    </Anchors>
+                  </Button>
+                </Frames>
+              </Frame> <!-- GBC_Status_Container -->
+            </Frames>
+          </Frame> <!-- GBC_Status -->
+        </Frames>
+      </Frame> <!--GBC_Panel_Lower-->
+    </Frames>
+  </Frame> <!-- GBC_Root -->
+  <Button name="GBC_MinimapBtn" parent="Minimap" enableMouse="true" movable="true" hidden="false">
+    <Size x="30" y="30"/>
+    <Anchors>
+      <Anchor point="TOPLEFT"/>
+    </Anchors>
+    <HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+    <Layers>
+      <Layer level="OVERLAY" textureSubLevel="1">
+        <Texture name="GBC_MinimapButton_Icon" file="Interface\AddOns\RollCasino\media\icon">
+          <Size x="18" y="18"/>
+          <Anchors>
+            <Anchor point="TOPLEFT">
+              <Offset x="7" y="-6"/>
+            </Anchor>
+          </Anchors>
+        </Texture>
+      </Layer>
+      <Layer level="OVERLAY" textureSubLevel="2">
+        <Texture file="Interface\Minimap\MiniMap-TrackingBorder">
+          <Size x="48" y="48"/>
+          <Anchors>
+            <Anchor point="TOPLEFT"/>
+          </Anchors>
+        </Texture>
+      </Layer>
+    </Layers>
+    <Frames>
+      <Frame name="GBC_MinimapBtn_DraggingFrame" hidden="true">
+        <Scripts>
+          <OnUpdate>
+            GBC_MinimapBtn_DraggingFrame_OnUpdate()
+          </OnUpdate>
+        </Scripts>
+      </Frame><!--GBC_MinimapBtn_DraggingFrame-->
+    </Frames>
+    <Scripts>
+      <OnLoad>
+        self:RegisterForClicks("LeftButtonUp","RightButtonUp")
+        self:RegisterForDrag("LeftButton","RightButton")
+      </OnLoad>
+      <OnDragStart>
+        self:LockHighlight()
+        GBC_MinimapBtn_DraggingFrame:Show()
+      </OnDragStart>
+      <OnDragStop>
+        self:UnlockHighlight()
+        GBC_MinimapBtn_DraggingFrame:Hide()
+      </OnDragStop>
+      <OnClick>
+        GBC_MinimapBtn_OnClick()
+      </OnClick>
+    </Scripts>
+  </Button> <!--GBC_MinimapBtn -->
 </Ui>
