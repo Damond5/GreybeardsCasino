@@ -8,13 +8,14 @@ local g_app = {
 	chatEnterMsg = "1",
 	chatWithdrawMsg = "-1",
 	chatMethods = {
-		"SAY",
 		"RAID",
+		"RAID_WARNING",
+		"SAY",
 		"PARTY",
 		"GUILD",
 		"CHANNEL",
 	},
-	currentChatMethod = "SAY",
+	currentChatMethod = "RAID",
 	savedStakes = 100,
 	showMinimap = false,
 	squareMinimap = false,
@@ -669,7 +670,7 @@ end
 function GBC_OnEvent(self, event, ...)
 	-- CHAT PARSING 
 	--TODO clean this up. sloppy string checking
-	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and g_app.currentChatMethod == "RAID") then
+	if ((event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_RAID") and g_round.acceptEntries and g_app.currentChatMethod == "RAID" or g_app.currentChatMethod == "RAID_WARNING") then
 		local msg, _,_,_,name = ... -- name no realm
 		ParseChatMsg(msg, name)
 	end
